@@ -127,10 +127,10 @@ export default function Summary() {
           <UploadedFiles section="" />
           <div className="my-2">
             <Tab.Group>
-              <Tab.List className="flex bg-gray-50 rounded p-2 space-x-2">
+              <Tab.List className="flex rounded space-x-2">
                 <Tab
                   className={({ selected }) =>
-                    `w-full p-2 rounded ${
+                    `w-full md:w-auto p-2 rounded ${
                       selected ? 'bg-udni-teal text-white' : 'bg-gray-100'
                     }`
                   }
@@ -139,7 +139,7 @@ export default function Summary() {
                 </Tab>
                 <Tab
                   className={({ selected }) =>
-                    `w-full rounded p-2 ${
+                    `w-full md:w-auto rounded p-2 ${
                       selected ? 'bg-udni-teal text-white' : 'bg-gray-100'
                     }`
                   }
@@ -177,8 +177,8 @@ export default function Summary() {
               </Tab.Panels>
             </Tab.Group>
 
-            <div className=" rounded bg-white p-4 my-4">
-              <label className="inline-block my-2">
+            <div className="md:flex  my-4">
+              <label className="inline-block my-2 mr-4">
                 <input
                   type="checkbox"
                   {...register('acceptTerms', { required: true })}
@@ -186,21 +186,21 @@ export default function Summary() {
                 />
                 I accept terms and conditions
               </label>
-
               <button
-                className="btn block "
+                className="btn block ml-auto"
                 type="submit"
                 disabled={
                   !isValid ||
                   isSubmitting ||
-                  !state.phenoPacket?.phenotypicFeatures
+                  !state.phenoPacket?.subject?.id?.length ||
+                  !state.phenoPacket?.phenotypicFeatures?.length
                 }
               >
                 {isSubmitting ? 'Submitting form...' : 'Submit form'}
               </button>
             </div>
             <button
-              className="text-xs border rounded-full p-2 text-slate-500 hover:text-slate-700"
+              className="text-xs  text-slate-500 hover:text-slate-700"
               onClick={async (e) => {
                 e.preventDefault();
                 resetForm();

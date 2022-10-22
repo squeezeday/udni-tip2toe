@@ -137,6 +137,7 @@ export default function Step() {
       } else {
         // add hpo term
         save(term, 'yes', label);
+        setMessage(undefined);
       }
     } catch (error) {
       setMessage('Unable to lookup HPO term at this time');
@@ -220,19 +221,25 @@ export default function Step() {
                     (st) =>
                       section?.features.some(
                         (sf) => sf.term === st.type?.id,
-                      ) === false && st.description === section?.chapter,
+                      ) === false && st.description === section?.slug,
                   )
                   .map((pf, i) => (
-                    <div className="flex my-1" key={`et-${pf.type?.id}-${i}`}>
-                      <p>
-                        <strong>{pf.type?.id}</strong> {pf.type?.label}
-                      </p>
-                      <button
-                        className=""
-                        onClick={() => removeTerm(pf.type?.id || '')}
-                      >
-                        <MinusCircleIcon className="w-4 h-4" />
-                      </button>
+                    <div className="" key={`et-${pf.type?.id}-${i}`}>
+                      <Feature
+                        question={{
+                          term: pf.type?.id || '',
+                          label: pf.type?.label || '',
+                        }}
+                        key={`feature-${pf.type?.id}`}
+                        value={getYesNoUnknown(
+                          state?.phenoPacket?.phenotypicFeatures?.find(
+                            (x) => x.type?.id === pf.type?.id,
+                          ),
+                        )}
+                        onChange={(value) => {
+                          save(pf.type?.id || '', value, pf.type?.label);
+                        }}
+                      />
                     </div>
                   ))}
               </div>
