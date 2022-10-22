@@ -1,0 +1,46 @@
+{
+  "name": "react-ts",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "start": "vite preview",
+    "preview": "vite preview",
+    "lint": "eslint ./src/**/*.tsx",
+    "lint:fix": "eslint --fix ./src/**/*.tsx",
+    "tsproto": "protoc --plugin=./node_modules/.bin/protoc-gen-ts_proto --proto_path=./phenopacket-schema/src/main/proto/ --ts_proto_opt=onlyTypes=true --ts_proto_opt=esModuleInterop=true --ts_proto_out=interfaces/ ./phenopacket-schema/src/main/proto/phenopackets/schema/v2/phenopackets.proto"
+  },
+  "dependencies": {
+    "@headlessui/react": "^1.7.3",
+    "@heroicons/react": "^2.0.8",
+    "file-saver": "^2.0.5",
+    "little-state-machine": "^4.6.0",
+    "rc-upload": "^4.3.4",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-hook-form": "^7.34.2",
+    "react-router-dom": "^6.4.1"
+  },
+  "devDependencies": {
+    "@types/react": "^18.0.17",
+    "@types/react-dom": "^18.0.6",
+    "@typescript-eslint/eslint-plugin": "^5.35.1",
+    "@typescript-eslint/parser": "^5.35.1",
+    "@vitejs/plugin-react": "^2.0.1",
+    "autoprefixer": "^10.4.8",
+    "eslint": "^8.23.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "eslint-plugin-react": "^7.31.1",
+    "postcss": "^8.4.16",
+    "prettier": "^2.7.1",
+    "protobufjs": "^7.1.2",
+    "tailwindcss": "^3.1.8",
+    "ts-proto": "^1.126.1",
+    "typescript": "^4.6.4",
+    "vite": "^3.0.7"
+  }
+}
