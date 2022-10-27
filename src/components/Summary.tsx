@@ -48,6 +48,8 @@ export default function Summary() {
         (file) =>
           ({
             uri: file.url,
+            fileAttributes: { description: file.section },
+            individualToFileIdentifiers: {},
           } as PhenopacketFile),
       ),
       metaData: {
