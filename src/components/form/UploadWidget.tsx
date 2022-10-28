@@ -1,33 +1,87 @@
-import { PhotoIcon } from '@heroicons/react/24/outline';
+import { PhotoIcon, XCircleIcon } from '@heroicons/react/24/outline';
+import { TrashIcon } from '@heroicons/react/24/solid';
 import { useStateMachine } from 'little-state-machine';
-import Upload from 'rc-upload';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useDropzone } from 'react-dropzone';
 import updateAction from '../../actions/updateAction';
 import { UploadedFile } from '../../types';
 import UploadedFiles from '../files/UploadedFiles';
-
-type FileStatus = File & {
-  error?: Error;
-  success?: boolean;
-  percent?: number;
-  _id?: string;
-};
 
 interface IProps {
   section: string;
 }
 
+type PreviewFile = File & { preview: string; path: string };
+
 export default function UploadWidget({ section }: IProps) {
   const { actions, state } = useStateMachine({ updateAction });
-
-  const [files, setFiles] = useState<FileStatus[]>([]);
+  const [files, setFiles] = useState<PreviewFile[]>([]);
+  const [isActive, setIsActive] = useState(false);
+  const { acceptedFiles, getRootProps, getInputProps } = useDropzone({
+    accept: {
+      'image/*': [],
+      'application/pdf': [],
+      'application/vnd.ms-excel': [],
+    },
+    onDrop: (acceptedFiles: File[]) => {
+      setIsActive(false);
+      setFiles((v) => [
+        ...v,
+        ...acceptedFiles.map(
+          (f) =>
+            ({
+              ...f,
+              preview: f.type.startsWith('image')
+                ? URL.createObjectURL(f)
+                : undefined,
+            } as PreviewFile),
+        ),
+      ]);
+    },
+    onDragEnter: () => setIsActive(true),
+    onDragLeave: () => setIsActive(false),
+  });
   const uploadUrl = `${import.meta.env.VITE_APIURL}/api/v1/file`;
 
+  const thumbs = files.map((file, i) => (
+    <div
+      key={file.path}
+      className="flex items-center justify-center bg-white rounded relative"
+    >
+      <div>
+        {file.preview ? (
+          <img
+            src={file.preview}
+            // Revoke data uri after image is loaded
+            onLoad={() => {
+              URL.revokeObjectURL(file.preview);
+            }}
+          />
+        ) : (
+          <p className="p-4 break-all">{file.path}</p>
+        )}
+      </div>
+      <button
+        className="absolute top-4 right-4 rounded-full bg-white"
+        onClick={() =>
+          setFiles((files) => files.filter((file, vi) => vi !== i))
+        }
+      >
+        <XCircleIcon className="w-6 h-6" />
+      </button>
+    </div>
+  ));
+
+  useEffect(() => {
+    // Make sure to revoke the data uris to avoid memory leaks, will run on unmount
+    return () => files.forEach((file) => URL.revokeObjectURL(file.preview));
+  }, []);
+
   return (
-    <div className="container max-w-5xl py-8 ">
-      <Upload
+    <div className="">
+      {/* <Upload
         multiple
-        className="border-dashed border border-udni-teal rounded bg-white text-slate-300 h-48 flex flex-col justify-center items-center"
+        className=" bg-white text-slate-300 h-48 flex flex-col justify-center items-center"
         name="file"
         action={uploadUrl}
         accept="image/*"
@@ -64,42 +118,32 @@ export default function UploadWidget({ section }: IProps) {
       >
         <PhotoIcon className="w-8 h-8 m-2" />
         <p>Click or drop files here</p>
-      </Upload>
-      <div className="my-4 grid grid-cols-2 md:grid-cols-4 gap-4">
-        {files.map((file) => (
-          <div key={file.name} className="relative">
-            <img
-              src={URL.createObjectURL(file)}
-              className={`object-contain m-auto max-h-52 ${
-                file.percent === 100 ? '' : 'opacity-50'
-              }`}
-            />
-            <div
-              className={`flex absolute top-0 left-0 h-full ${
-                file.error ? 'bg-red-500 w-full' : ''
-              } ${
-                file.percent && file.percent < 100
-                  ? 'bg-udni-teal opacity-50'
-                  : ''
-              } `}
-              style={{
-                width: file.percent
-                  ? `${Math.round(file.percent)}%`
-                  : undefined,
-              }}
-            >
-              <p className="m-auto inline-block">
-                {file.error ? 'Error: ' + file.error?.message : null}{' '}
-                {file.percent && file.percent < 100
-                  ? `${Math.round(file.percent)}%`
-                  : null}
-              </p>
-            </div>
-          </div>
-        ))}
+      </Upload> */}
+      <div
+        {...getRootProps({
+          className: `border-dashed border-2 p-4 mb-4 ${
+            isActive
+              ? 'border-udni-teal text-udni-teal'
+              : 'border-gray-300 text-slate-300'
+          } rounded bg-white  flex flex-col justify-center items-center select-none`,
+        })}
+      >
+        <input {...getInputProps()} />
+        <PhotoIcon className="w-8 h-8 m-2" />
+        <p>Click or drop files here</p>
       </div>
+      <aside className="grid grid-cols-2 md:grid-cols-6 gap-4">{thumbs}</aside>
 
-      <UploadedFiles section={section} />
+      {files.length ? (
+        <button
+          type="submit"
+          className="border rounded p-2 px-5 my-2 border-udni-teal text-udni-teal uppercase text-sm font-bold hover:bg-udni-teal hover:text-white"
+        >
+          Upload and Save
+        </button>
+      ) : null}
+
+      {/* <UploadedFiles section={section} /> */}
     </div>
   );
 }

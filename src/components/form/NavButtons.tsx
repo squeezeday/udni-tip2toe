@@ -19,7 +19,10 @@ export default function NavButtons() {
     <div className="fixed left-0 w-full bottom-0 bg-white border-t border-slate-200 ">
       <div className="flex px-4 h-16 justify-between items-center max-w-6xl mx-auto">
         {prev ? (
-          <NavLink to={prev} className="btn">
+          <NavLink
+            to={prev}
+            className="flex border rounded p-2 px-4  border-udni-teal text-udni-teal uppercase text-sm font-bold hover:bg-udni-teal hover:text-white"
+          >
             <ChevronLeftIcon className="w-4 h-4 mr-1 flex-none" />
             Previous
           </NavLink>
@@ -27,7 +30,10 @@ export default function NavButtons() {
           <div></div>
         )}
         {next && (
-          <NavLink className="btn" to={next}>
+          <NavLink
+            className="flex border rounded p-2 px-4  border-udni-teal text-udni-teal uppercase text-sm font-bold hover:bg-udni-teal hover:text-white"
+            to={next}
+          >
             Next <ChevronRightIcon className="w-4 ml-1 flex-none" />
           </NavLink>
         )}

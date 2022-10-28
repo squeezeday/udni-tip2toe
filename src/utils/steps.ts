@@ -6,17 +6,12 @@ interface IMenuItem {
 }
 
 const steps: IMenuItem[] = [
-  { label: 'Individual', url: '/form/individual' },
-  { label: 'Photographs', url: '/form/photographs' },
-  { label: 'Pedigree', url: '/form/pedigree' },
-  { label: 'Growth Charts', url: '/form/growth-charts' },
-  { label: 'X-Ray/MRI/CT', url: '/form/xray-mri-ct' },
-  { label: 'Laboratory', url: '/form/laboratory' },
+  { label: 'Individual', url: '/questionnaire/individual' },
   ...sections.map((section) => ({
     label: section.chapter,
-    url: `/form/step/${section.slug}`,
+    url: `/questionnaire/${section.slug}`,
   })),
-  { label: 'Summary', url: '/form/summary' },
+  { label: 'Summary', url: '/questionnaire/summary' },
 ];
 
 export default steps;

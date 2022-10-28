@@ -4,6 +4,9 @@ module.exports = {
   theme: {
     extend: {
       colors: {
+        'udni-teal-100': '#EDFBFD',
+        'udni-teal-200': '#91E7F2',
+        'udni-teal-400': '#48D7EA',
         'udni-teal': '#18B6CC',
         'udni-purple': '#4F5C5F',
       },
@@ -16,5 +19,5 @@ module.exports = {
       center: true,
     },
   },
-  plugins: [],
+  plugins: [require('@tailwindcss/forms')],
 };

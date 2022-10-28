@@ -9,17 +9,19 @@ interface IProps {
 export default function Feature({ question, value, onChange }: IProps) {
   const { term, label } = question;
   return (
-    <div className="py-2 border-b " key={`chk-${term}`}>
-      <p className="relative pb-2">
-        <span className="float-right">{term}</span>
-        {label}
-      </p>
-      <SelectNormal
-        value={value}
-        onChange={(v) => {
-          onChange(v);
-        }}
-      />
+    <div>
+      <div>
+        <h3 className="m-0">{label}</h3>
+        <p className="text-sm text-gray-500">{term}</p>
+      </div>
+      <div className="mt-4">
+        <SelectNormal
+          value={value}
+          onChange={(v) => {
+            onChange(v);
+          }}
+        />
+      </div>
     </div>
   );
 }

@@ -4,7 +4,7 @@
 
 @layer base {
   body {
-    @apply text-gray-800 overflow-y-scroll  p-0 m-0;
+    @apply text-gray-700 overflow-y-scroll  p-0 m-0 bg-gray-50;
   }
   body,
   html,
@@ -15,29 +15,18 @@
     @apply text-udni-teal;
   }
   h1 {
-    @apply text-3xl font-bold my-5 text-udni-teal;
+    @apply text-3xl font-bold my-5;
   }
   h2 {
-    @apply text-2xl font-bold my-4 text-udni-teal;
+    @apply text-2xl  my-4;
   }
   h3 {
-    @apply text-xl font-bold my-2 text-udni-teal;
+    @apply text-xl  my-2;
   }
   h4 {
-    @apply text-base font-bold my-1 text-udni-teal;
+    @apply text-base  my-1;
   }
-  .btn {
-    @apply flex p-4 py-2 rounded-full border-2 border-udni-teal hover:bg-udni-teal text-udni-teal hover:text-white font-bold items-center;
-  }
-  .btn.btn-sm {
-    @apply text-xs border rounded-md font-normal;
-  }
-  .btn.secondary {
-    @apply border-slate-400 text-slate-400 hover:bg-udni-teal  hover:text-white hover:border-udni-teal;
-  }
-  .btn:disabled {
-    @apply text-gray-300 border-gray-300 hover:bg-transparent;
-  }
+
   .navlink.active {
     @apply text-udni-teal bg-white rounded md:shadow-sm;
   }

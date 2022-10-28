@@ -6,9 +6,10 @@ import updateAction from '../actions/updateAction';
 import { PhenotypicFeature } from '../interfaces/phenopackets/schema/v2/core/phenotypic_feature';
 import sections from '../sections';
 import { ISection, YesNoUnknown } from '../types';
-import lookupHpoTerm from '../utils/lookupHpoTerm';
+import { lookupHpoTerm } from '../utils/lookupHpoTerm';
 import AddCustomTerm, { AddCustomTermFormModel } from './form/AddCustomTerm';
 import Feature from './form/Feature';
+import NavButtons from './form/NavButtons';
 
 export default function Step() {
   const { actions, state } = useStateMachine({ updateAction });
@@ -156,19 +157,19 @@ export default function Step() {
 
       <div className="inline-flex my-2 text-xs border rounded border-slate-300 text-slate-500">
         <button
-          className="flex items-center p-2 hover:bg-gray-200"
+          className="flex items-center p-2 hover:bg-white hover:text-gray-700"
           onClick={() => setAllValues('no')}
         >
           Normal
         </button>
         <button
-          className="flex items-center p-2 border-l hover:bg-gray-200"
+          className="flex items-center p-2 border-l hover:bg-white hover:text-gray-700"
           onClick={() => setAllValues('unknown')}
         >
           Abnormal
         </button>
         <button
-          className="flex items-center p-2 border-l hover:bg-gray-200"
+          className="flex items-center p-2 border-l hover:bg-white hover:text-gray-700"
           onClick={() => setAllValues('unknown')}
         >
           Not investigated
@@ -178,30 +179,31 @@ export default function Step() {
     </button> */}
       </div>
       {section && (
-        <fieldset className="border-t mt-4">
+        <fieldset className="mt-4 divide-y divide-gray-300">
           {section?.features
             .filter((x) => x.term !== 'other')
             .map((feature) => (
-              <Feature
-                question={feature}
-                key={`feature-${feature.term}`}
-                value={
-                  //selectedTerms?.find((x) => x.term === feature.term)?.value ??
-                  getYesNoUnknown(
-                    state?.phenoPacket?.phenotypicFeatures?.find(
-                      (x) => x.type?.id === feature.term,
-                    ),
-                  )
-                }
-                onChange={(value) => {
-                  save(feature.term, value);
-                }}
-              />
+              <div key={`feature-${feature.term}`} className="p-4">
+                <Feature
+                  question={feature}
+                  value={
+                    //selectedTerms?.find((x) => x.term === feature.term)?.value ??
+                    getYesNoUnknown(
+                      state?.phenoPacket?.phenotypicFeatures?.find(
+                        (x) => x.type?.id === feature.term,
+                      ),
+                    )
+                  }
+                  onChange={(value) => {
+                    save(feature.term, value);
+                  }}
+                />
+              </div>
             ))}
           {section?.features
             .filter((x) => x.term === 'other')
             .map((feature) => (
-              <div className="py-2 my-1" key={`chk-other`}>
+              <div className="p-4" key={`chk-other`}>
                 <p className="my-2">{feature.label}</p>
                 <AddCustomTerm
                   onSubmit={onAddCustomTerm}
@@ -216,36 +218,39 @@ export default function Step() {
                   </p>
                 )}
 
-                {state.phenoPacket?.phenotypicFeatures
-                  ?.filter(
-                    (st) =>
-                      section?.features.some(
-                        (sf) => sf.term === st.type?.id,
-                      ) === false && st.description === section?.slug,
-                  )
-                  .map((pf, i) => (
-                    <div className="" key={`et-${pf.type?.id}-${i}`}>
-                      <Feature
-                        question={{
-                          term: pf.type?.id || '',
-                          label: pf.type?.label || '',
-                        }}
-                        key={`feature-${pf.type?.id}`}
-                        value={getYesNoUnknown(
-                          state?.phenoPacket?.phenotypicFeatures?.find(
-                            (x) => x.type?.id === pf.type?.id,
-                          ),
-                        )}
-                        onChange={(value) => {
-                          save(pf.type?.id || '', value, pf.type?.label);
-                        }}
-                      />
-                    </div>
-                  ))}
+                <div className="mt-4 divide-y divide-gray-300">
+                  {state.phenoPacket?.phenotypicFeatures
+                    ?.filter(
+                      (st) =>
+                        section?.features.some(
+                          (sf) => sf.term === st.type?.id,
+                        ) === false && st.description === section?.slug,
+                    )
+                    .map((pf, i) => (
+                      <div className="" key={`et-${pf.type?.id}-${i}`}>
+                        <Feature
+                          question={{
+                            term: pf.type?.id || '',
+                            label: pf.type?.label || '',
+                          }}
+                          key={`feature-${pf.type?.id}`}
+                          value={getYesNoUnknown(
+                            state?.phenoPacket?.phenotypicFeatures?.find(
+                              (x) => x.type?.id === pf.type?.id,
+                            ),
+                          )}
+                          onChange={(value) => {
+                            save(pf.type?.id || '', value, pf.type?.label);
+                          }}
+                        />
+                      </div>
+                    ))}
+                </div>
               </div>
             ))}
         </fieldset>
       )}
+      <NavButtons />
     </>
   );
 }
