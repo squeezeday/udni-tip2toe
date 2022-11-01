@@ -1,4 +1,4 @@
-import { YesNoUnknown } from '../../types';
+import { YesNoUnknown } from '../../../types';
 
 interface IProps {
   value?: YesNoUnknown;

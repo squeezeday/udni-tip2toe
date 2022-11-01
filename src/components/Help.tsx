@@ -1,6 +1,9 @@
+import NavBar from './questionnaire/layouts/NavBar';
+
 export default function Help() {
   return (
     <>
+      <NavBar />
       <div className="container max-w-6xl p-4">
         <p className="">
           Questionnaire for the Undiagnosed Diseases Network International

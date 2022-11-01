@@ -1,11 +1,15 @@
-import { PhotoIcon, XCircleIcon } from '@heroicons/react/24/outline';
-import { TrashIcon } from '@heroicons/react/24/solid';
+import {
+  PhotoIcon,
+  XCircleIcon,
+  CloudArrowUpIcon,
+} from '@heroicons/react/24/outline';
 import { useStateMachine } from 'little-state-machine';
 import { useEffect, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
-import updateAction from '../../actions/updateAction';
-import { UploadedFile } from '../../types';
-import UploadedFiles from '../files/UploadedFiles';
+import updateAction from '../../../actions/updateAction';
+import { UploadedFile } from '../../../types';
+import UploadedFiles from './UploadedFiles';
+import Spinner from '../../common/Spinner';
 
 interface IProps {
   section: string;
@@ -17,7 +21,8 @@ export default function UploadWidget({ section }: IProps) {
   const { actions, state } = useStateMachine({ updateAction });
   const [files, setFiles] = useState<PreviewFile[]>([]);
   const [isActive, setIsActive] = useState(false);
-  const { acceptedFiles, getRootProps, getInputProps } = useDropzone({
+  const [uploading, setUploading] = useState(false);
+  const { getRootProps, getInputProps } = useDropzone({
     accept: {
       'image/*': [],
       'application/pdf': [],
@@ -43,6 +48,32 @@ export default function UploadWidget({ section }: IProps) {
   });
   const uploadUrl = `${import.meta.env.VITE_APIURL}/api/v1/file`;
 
+  const uploadFile = async (file: File) => {
+    const body = new FormData();
+    body.append('file', file);
+    const ret = await fetch(uploadUrl, { method: 'POST', body });
+    const uploadedFile = (await ret.json()) as unknown as UploadedFile;
+    setFiles((values) => values.filter((x) => x.name !== file.name));
+
+    const files = state.files ? state.files : [];
+    actions.updateAction({
+      ...state,
+      files: [...files, { ...uploadedFile, section }],
+    });
+  };
+
+  const uploadFiles = async () => {
+    setUploading(true);
+    for (let i = 0; i < files.length; i++) {
+      try {
+        await uploadFile(files[i]);
+      } catch (error) {
+      } finally {
+      }
+    }
+    setUploading(false);
+  };
+
   const thumbs = files.map((file, i) => (
     <div
       key={file.path}
@@ -63,6 +94,7 @@ export default function UploadWidget({ section }: IProps) {
       </div>
       <button
         className="absolute top-4 right-4 rounded-full bg-white"
+        disabled={uploading}
         onClick={() =>
           setFiles((files) => files.filter((file, vi) => vi !== i))
         }
@@ -79,46 +111,6 @@ export default function UploadWidget({ section }: IProps) {
 
   return (
     <div className="">
-      {/* <Upload
-        multiple
-        className=" bg-white text-slate-300 h-48 flex flex-col justify-center items-center"
-        name="file"
-        action={uploadUrl}
-        accept="image/*"
-        onStart={(file) => setFiles((values) => [...values, file])}
-        onError={(err, _, file) =>
-          setFiles((values) => {
-            const ret = [...values];
-            const i = values.findIndex((v) => v.name === file.name);
-            if (i > -1) {
-              ret[i].error = err;
-            }
-            return ret;
-          })
-        }
-        onProgress={(e, file) => {
-          setFiles((values) => {
-            const ret = [...values];
-            const i = values.findIndex((v) => v.name === file.name);
-            if (i > -1) {
-              ret[i].percent = e.percent;
-            }
-            return ret;
-          });
-        }}
-        onSuccess={(response, file) => {
-          const uploadedFile = response as unknown as UploadedFile;
-          setFiles((values) => values.filter((x) => x.name !== file.name));
-          const files = state.files ? state.files : [];
-          actions.updateAction({
-            ...state,
-            files: [...files, { ...uploadedFile, section }],
-          });
-        }}
-      >
-        <PhotoIcon className="w-8 h-8 m-2" />
-        <p>Click or drop files here</p>
-      </Upload> */}
       <div
         {...getRootProps({
           className: `border-dashed border-2 p-4 mb-4 ${
@@ -129,21 +121,25 @@ export default function UploadWidget({ section }: IProps) {
         })}
       >
         <input {...getInputProps()} />
-        <PhotoIcon className="w-8 h-8 m-2" />
+        <PhotoIcon className="w-8 h-8" />
         <p>Click or drop files here</p>
       </div>
-      <aside className="grid grid-cols-2 md:grid-cols-6 gap-4">{thumbs}</aside>
+      <aside className="grid grid-cols-2 md:grid-cols-4 gap-4">{thumbs}</aside>
 
       {files.length ? (
         <button
+          disabled={uploading}
           type="submit"
-          className="border rounded p-2 px-5 my-2 border-udni-teal text-udni-teal uppercase text-sm font-bold hover:bg-udni-teal hover:text-white"
+          className="border rounded p-2 px-4 my-2 border-udni-teal text-udni-teal uppercase text-sm font-bold hover:bg-udni-teal hover:text-white"
+          onClick={uploadFiles}
         >
+          <CloudArrowUpIcon className="w-4 h-4 inline-block mr-2" />
           Upload and Save
+          {uploading ? <Spinner /> : null}
         </button>
       ) : null}
 
-      {/* <UploadedFiles section={section} /> */}
+      <UploadedFiles section={section} />
     </div>
   );
 }

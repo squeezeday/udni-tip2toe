@@ -2,7 +2,7 @@ import { Combobox } from '@headlessui/react';
 import { PlusIcon } from '@heroicons/react/24/solid';
 import { Fragment, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { IJaxTerm, searchHpoTerms } from '../../utils/lookupHpoTerm';
+import { IJaxTerm, searchHpoTerms } from '../../../utils/lookupHpoTerm';
 
 export interface AddCustomTermFormModel {
   term: string;

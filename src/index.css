@@ -24,10 +24,24 @@
     @apply text-xl  my-2;
   }
   h4 {
-    @apply text-base  my-1;
+    @apply text-lg  my-1;
   }
-
+  h5 {
+    @apply text-base;
+  }
+  ul {
+    @apply my-2;
+  }
+  ol {
+    @apply list-decimal;
+  }
+  li {
+    @apply list-disc ml-4;
+  }
   .navlink.active {
     @apply text-udni-teal bg-white rounded md:shadow-sm;
+  }
+  th {
+    text-align: left;
   }
 }

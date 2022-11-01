@@ -1,44 +1,44 @@
-import { MinusCircleIcon } from '@heroicons/react/24/solid';
 import { useStateMachine } from 'little-state-machine';
-import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import updateAction from '../actions/updateAction';
-import { PhenotypicFeature } from '../interfaces/phenopackets/schema/v2/core/phenotypic_feature';
-import sections from '../sections';
-import { ISection, YesNoUnknown } from '../types';
-import { lookupHpoTerm } from '../utils/lookupHpoTerm';
+import { useState } from 'react';
+import updateAction from '../../actions/updateAction';
+import { PhenotypicFeature } from '../../interfaces/phenopackets/schema/v2/core/phenotypic_feature';
+import tip2toeForm from '../../tip2toeform';
+import { IFormSection, YesNoUnknown } from '../../types';
+import { lookupHpoTerm } from '../../utils/lookupHpoTerm';
 import AddCustomTerm, { AddCustomTermFormModel } from './form/AddCustomTerm';
-import Feature from './form/Feature';
+import EditPhenotypicFeature from './form/EditPhenotypicFeature';
 import NavButtons from './form/NavButtons';
 
-export default function Step() {
+interface IProps {
+  formSection: IFormSection;
+}
+export default function EditPhenotypicFeatures({ formSection }: IProps) {
   const { actions, state } = useStateMachine({ updateAction });
-  const { slug } = useParams();
 
-  const [section, setSection] = useState<ISection | undefined>(undefined);
-
-  useEffect(() => {
-    const i = Number(sections.findIndex((x) => x.slug === slug));
-    if (i >= 0) setSection(sections[i]);
-  }, [slug]);
-
-  const save = async (term: string, value: YesNoUnknown, label?: string) => {
+  const save = async (
+    ontologyTypeId: string,
+    value: YesNoUnknown,
+    label?: string,
+  ) => {
     const phenotypicFeatures =
       state.phenoPacket.phenotypicFeatures?.filter(
-        (x) => x.type?.id !== term,
+        (x) => x.type?.id !== ontologyTypeId,
       ) ?? [];
     if (value !== 'unknown')
       phenotypicFeatures.push({
         type: {
-          id: term,
+          id: ontologyTypeId,
           label:
             label ??
-            section?.features.find((x) => x.term === term)?.label ??
+            formSection?.ontologies?.find((x) => x.id === ontologyTypeId)
+              ?.label ??
             '',
         },
-        description: section?.features.some((x) => x.term === term)
+        description: formSection?.ontologies?.some(
+          (x) => x.id === ontologyTypeId,
+        )
           ? ''
-          : section?.slug ?? '', // handle custom term: save section.. TODO: better implementation needed
+          : formSection?.slug ?? '', // handle custom term: save formSection.. TODO: better implementation needed
         evidence: [],
         excluded: value === 'no',
         modifiers: [],
@@ -52,16 +52,6 @@ export default function Step() {
       phenoPacket: { ...state.phenoPacket, phenotypicFeatures },
     });
   };
-  const removeTerm = async (term: string) => {
-    const phenotypicFeatures =
-      state.phenoPacket.phenotypicFeatures?.filter(
-        (x) => x.type?.id !== term,
-      ) ?? [];
-    await actions.updateAction({
-      ...state,
-      phenoPacket: { ...state.phenoPacket, phenotypicFeatures },
-    });
-  };
 
   const setAllValues = async (value: YesNoUnknown) => {
     let phenotypicFeatures = [];
@@ -69,7 +59,8 @@ export default function Step() {
       phenotypicFeatures = [
         ...(state.phenoPacket?.phenotypicFeatures?.filter(
           (st) =>
-            section?.features.some((sf) => sf.term === st.type?.id) === false,
+            formSection?.ontologies?.some((sf) => sf.id === st.type?.id) ===
+            false,
         ) || []),
       ];
       await actions.updateAction({
@@ -80,13 +71,14 @@ export default function Step() {
       phenotypicFeatures = [
         ...(state.phenoPacket?.phenotypicFeatures?.filter(
           (st) =>
-            section?.features.some((sf) => sf.term === st.type?.id) === false,
+            formSection?.ontologies?.some((sf) => sf.id === st.type?.id) ===
+            false,
         ) || []),
-        ...(section?.features.map(
+        ...(formSection?.ontologies?.map(
           (x) =>
             ({
               type: {
-                id: x.term,
+                id: x.id,
                 label: x.label,
               },
               description: '',
@@ -111,22 +103,24 @@ export default function Step() {
   const onAddCustomTerm = async ({ term }: AddCustomTermFormModel) => {
     setMessage(`Looking up term ${term}...`);
     // check duplicate
-    const feature = section?.features.find((x) => x.term === term);
+    const feature = formSection?.ontologies?.find((x) => x.id === term);
     if (feature) {
       // setSelectedTerms((values) => [
-      //   ...(values?.filter((x) => x.term !== term) ?? []),
+      //   ...(values?.filter((x) => x.id !== term) ?? []),
       //   { term, value: 'yes' },
       // ]);
       save(term, 'yes');
       setMessage(`Added ${term}: ${feature.label}`);
       return;
     }
-    // check if this term is available in some other section
-    const foundSection = sections.find((x) =>
-      x.features.some((st) => st.term === term),
+    // check if this term is available in some other formSection
+    const foundSection = tip2toeForm.formSections?.find((x) =>
+      x.ontologies?.some((st) => st.id === term),
     );
     if (foundSection) {
-      setMessage(`The term ${term} exists in section ${foundSection.chapter}`);
+      setMessage(
+        `The term ${term} exists in formSection ${foundSection.title}`,
+      );
       return;
     }
 
@@ -153,8 +147,6 @@ export default function Step() {
   };
   return (
     <>
-      <h2>{section?.chapter}</h2>
-
       <div className="inline-flex my-2 text-xs border rounded border-slate-300 text-slate-500">
         <button
           className="flex items-center p-2 hover:bg-white hover:text-gray-700"
@@ -178,40 +170,37 @@ export default function Step() {
       Next <ChevronRightIcon className="w-4 ml-1" />
     </button> */}
       </div>
-      {section && (
+      {formSection && (
         <fieldset className="mt-4 divide-y divide-gray-300">
-          {section?.features
-            .filter((x) => x.term !== 'other')
-            .map((feature) => (
-              <div key={`feature-${feature.term}`} className="p-4">
-                <Feature
-                  question={feature}
-                  value={
-                    //selectedTerms?.find((x) => x.term === feature.term)?.value ??
-                    getYesNoUnknown(
-                      state?.phenoPacket?.phenotypicFeatures?.find(
-                        (x) => x.type?.id === feature.term,
-                      ),
-                    )
-                  }
+          {formSection?.ontologies
+            ?.filter((x) => x.id !== 'other')
+            .map((ontology) => (
+              <div key={`feature-${ontology.id}`} className="py-4">
+                <EditPhenotypicFeature
+                  ontology={ontology}
+                  value={getYesNoUnknown(
+                    state?.phenoPacket?.phenotypicFeatures?.find(
+                      (x) => x.type?.id === ontology.id,
+                    ),
+                  )}
                   onChange={(value) => {
-                    save(feature.term, value);
+                    save(ontology.id, value);
                   }}
                 />
               </div>
             ))}
-          {section?.features
-            .filter((x) => x.term === 'other')
-            .map((feature) => (
-              <div className="p-4" key={`chk-other`}>
-                <p className="my-2">{feature.label}</p>
+          {formSection?.ontologies
+            ?.filter((x) => x.id === 'other')
+            .map(({ label }) => (
+              <div className="py-4" key={`chk-other`}>
+                <p className="my-2">{label}</p>
                 <AddCustomTerm
                   onSubmit={onAddCustomTerm}
-                  key={`act-${section?.slug}`}
+                  key={`act-${formSection?.slug}`}
                 />
                 {message && (
                   <p
-                    key={`act-msg-${section?.slug}`}
+                    key={`act-msg-${formSection?.slug}`}
                     onClick={() => setMessage(undefined)}
                   >
                     {message}
@@ -222,18 +211,16 @@ export default function Step() {
                   {state.phenoPacket?.phenotypicFeatures
                     ?.filter(
                       (st) =>
-                        section?.features.some(
-                          (sf) => sf.term === st.type?.id,
-                        ) === false && st.description === section?.slug,
+                        formSection?.ontologies?.some(
+                          (sf) => sf.id === st.type?.id,
+                        ) === false && st.description === formSection?.slug,
                     )
-                    .map((pf, i) => (
-                      <div className="" key={`et-${pf.type?.id}-${i}`}>
-                        <Feature
-                          question={{
-                            term: pf.type?.id || '',
-                            label: pf.type?.label || '',
-                          }}
-                          key={`feature-${pf.type?.id}`}
+                    .map((pf, i) => {
+                      if (!pf.type) return null;
+                      return (
+                        <EditPhenotypicFeature
+                          key={`et-${pf.type?.id}-${i}`}
+                          ontology={pf.type}
                           value={getYesNoUnknown(
                             state?.phenoPacket?.phenotypicFeatures?.find(
                               (x) => x.type?.id === pf.type?.id,
@@ -243,8 +230,8 @@ export default function Step() {
                             save(pf.type?.id || '', value, pf.type?.label);
                           }}
                         />
-                      </div>
-                    ))}
+                      );
+                    })}
                 </div>
               </div>
             ))}
