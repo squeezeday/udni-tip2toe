@@ -1,15 +1,14 @@
-import { useStateMachine } from 'little-state-machine';
-import resetAction from '../../actions/resetAction';
-import updateAction from '../../actions/updateAction';
 import PhenotypicFeaturesList from '../summary/PhenotypicFeaturesList';
 import { PrinterIcon } from '@heroicons/react/24/outline';
 import tip2toeForm from '../../tip2toeform';
 import ViewFormSection from './ViewFormSection';
 import ViewIndividual from './ViewIndividual';
 import NavButtons from './form/NavButtons';
+import { useContext } from 'react';
+import { AppContext } from '../../context/AppContext';
 
 export default function Summary() {
-  const { state } = useStateMachine({ updateAction, resetAction });
+  const { state } = useContext(AppContext);
 
   return (
     <>

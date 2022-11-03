@@ -1,8 +1,8 @@
-import { useStateMachine } from 'little-state-machine';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
-import updateAction from '../actions/updateAction';
+import { AppContext } from '../context/AppContext';
+
 import { Phenopacket } from '../interfaces/phenopackets/schema/v2/phenopackets';
 import Spinner from './common/Spinner';
 
@@ -15,7 +15,7 @@ export default function ContinueForm() {
   const navigate = useNavigate();
   const [error, setError] = useState<undefined | string>();
   const [loading, setLoading] = useState(false);
-  const { actions, state } = useStateMachine({ updateAction });
+  const { dispatch } = useContext(AppContext);
   const {
     register,
     handleSubmit,
@@ -32,10 +32,7 @@ export default function ContinueForm() {
       });
       if (ret.ok) {
         const phenoPacket: Partial<Phenopacket> = await ret.json();
-        await actions.updateAction({
-          ...state,
-          phenoPacket,
-        });
+        dispatch({ type: 'SET_PHENOPACKET', payload: phenoPacket });
         navigate(`/questionnaire`);
       } else {
         setError('Phenopacket not found');

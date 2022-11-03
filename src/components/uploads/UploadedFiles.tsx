@@ -1,12 +1,12 @@
 import { MinusCircleIcon } from '@heroicons/react/24/solid';
-import { useStateMachine } from 'little-state-machine';
-import updateAction from '../../actions/updateAction';
+import { useContext } from 'react';
+import { AppContext } from '../../context/AppContext';
 
 interface IProps {
   section: string;
 }
 export default function UploadedFiles({ section }: IProps) {
-  const { actions, state } = useStateMachine({ updateAction });
+  const { state, dispatch } = useContext(AppContext);
 
   return (
     <>
@@ -28,10 +28,7 @@ export default function UploadedFiles({ section }: IProps) {
               <button
                 className="btn btn-sm absolute right-2 bottom-2 bg-white"
                 onClick={() => {
-                  actions.updateAction({
-                    ...state,
-                    files: state.files.filter((f) => f._id !== file._id),
-                  });
+                  dispatch({ type: 'REMOVE_FILE', payload: file });
                 }}
               >
                 <MinusCircleIcon className="h-4 w-4" /> Remove

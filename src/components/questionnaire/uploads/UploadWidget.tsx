@@ -3,13 +3,12 @@ import {
   XCircleIcon,
   CloudArrowUpIcon,
 } from '@heroicons/react/24/outline';
-import { useStateMachine } from 'little-state-machine';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
-import updateAction from '../../../actions/updateAction';
 import { UploadedFile } from '../../../types';
 import UploadedFiles from './UploadedFiles';
 import Spinner from '../../common/Spinner';
+import { AppContext } from '../../../context/AppContext';
 
 interface IProps {
   section: string;
@@ -18,7 +17,7 @@ interface IProps {
 type PreviewFile = File & { preview: string; path: string };
 
 export default function UploadWidget({ section }: IProps) {
-  const { actions, state } = useStateMachine({ updateAction });
+  const { dispatch } = useContext(AppContext);
   const [files, setFiles] = useState<PreviewFile[]>([]);
   const [isActive, setIsActive] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -55,11 +54,7 @@ export default function UploadWidget({ section }: IProps) {
     const uploadedFile = (await ret.json()) as unknown as UploadedFile;
     setFiles((values) => values.filter((x) => x.name !== file.name));
 
-    const files = state.files ? state.files : [];
-    actions.updateAction({
-      ...state,
-      files: [...files, { ...uploadedFile, section }],
-    });
+    dispatch({ type: 'ADD_FILE', payload: uploadedFile });
   };
 
   const uploadFiles = async () => {

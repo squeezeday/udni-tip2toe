@@ -1,7 +1,7 @@
-import { useStateMachine } from 'little-state-machine';
+import { useContext } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
-import updateAction from '../../actions/updateAction';
+import { AppContext } from '../../context/AppContext';
 import {
   Individual,
   KaryotypicSex,
@@ -22,7 +22,8 @@ export interface IIndividualFormData {
 export default function EditIndividual() {
   const navigate = useNavigate();
   const { nextUrl } = useNextUrl();
-  const { actions, state } = useStateMachine({ updateAction });
+
+  const { state, dispatch } = useContext(AppContext);
 
   const {
     register,
@@ -36,25 +37,21 @@ export default function EditIndividual() {
   });
 
   const doSubmit = async (formData: IIndividualFormData) => {
-    await actions.updateAction({
-      ...state,
-      phenoPacket: {
-        ...state.phenoPacket,
-        subject: {
-          alternateIds: [],
-          dateOfBirth: undefined,
-          gender: undefined,
-          karyotypicSex: KaryotypicSex.UNKNOWN_KARYOTYPE,
-          taxonomy: undefined,
-          timeAtLastEncounter: undefined,
-          id: '',
-          sex: Sex.UNKNOWN_SEX,
-          vitalStatus: undefined,
-          ...formData.subject,
-        },
-      },
-      customFormData: { ...state.customFormData, ...formData.customFormData },
-    });
+    const subject = {
+      alternateIds: [],
+      dateOfBirth: undefined,
+      gender: undefined,
+      karyotypicSex: KaryotypicSex.UNKNOWN_KARYOTYPE,
+      taxonomy: undefined,
+      timeAtLastEncounter: undefined,
+      id: '',
+      sex: Sex.UNKNOWN_SEX,
+      vitalStatus: undefined,
+      ...formData.subject,
+    };
+    dispatch({ type: 'SET_INDIVIDUAL', payload: subject });
+    dispatch({ type: 'CUSTOM_FORM_DATA', payload: formData.customFormData });
+
     nextUrl !== null && navigate(nextUrl);
   };
   return (

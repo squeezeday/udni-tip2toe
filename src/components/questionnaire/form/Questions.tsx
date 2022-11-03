@@ -1,7 +1,7 @@
-import { useStateMachine } from 'little-state-machine';
+import { useContext } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
-import updateAction from '../../../actions/updateAction';
+import { AppContext } from '../../../context/AppContext';
 import { ICustomFormData, IFormSection } from '../../../types';
 import Input from '../../individual/Input';
 import Select from '../../individual/Select';
@@ -13,7 +13,7 @@ interface IProps {
   formSection: IFormSection;
 }
 export default function Questions({ formSection }: IProps) {
-  const { actions, state } = useStateMachine({ updateAction });
+  const { state, dispatch } = useContext(AppContext);
   const { nextUrl } = useNextUrl();
   const navigate = useNavigate();
 
@@ -22,10 +22,7 @@ export default function Questions({ formSection }: IProps) {
   });
 
   const doSubmit = async (formData: ICustomFormData) => {
-    await actions.updateAction({
-      ...state,
-      customFormData: { ...state.customFormData, ...formData },
-    });
+    dispatch({ type: 'CUSTOM_FORM_DATA', payload: formData });
     nextUrl !== null && navigate(nextUrl);
   };
   return (

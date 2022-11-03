@@ -1,9 +1,7 @@
-import { useStateMachine } from 'little-state-machine';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate, Link } from 'react-router-dom';
-import resetAction from '../../actions/resetAction';
-import updateAction from '../../actions/updateAction';
+import { AppContext } from '../../context/AppContext';
 import { File as PhenopacketFile } from '../../interfaces/phenopackets/schema/v2/core/base';
 import { Phenopacket } from '../../interfaces/phenopackets/schema/v2/phenopackets';
 import { PhenopacketEntity } from '../../types';
@@ -13,7 +11,7 @@ interface ISummaryFormModel {
 }
 
 export default function SubmitForm() {
-  const { actions, state } = useStateMachine({ updateAction, resetAction });
+  const { state, dispatch } = useContext(AppContext);
   const navigate = useNavigate();
   const [phenoPacket, setPhenoPacket] = useState<
     PhenopacketEntity | undefined
@@ -29,7 +27,7 @@ export default function SubmitForm() {
   const resetForm = async () => {
     if (confirm('Clear form data?')) {
       reset();
-      await actions.resetAction();
+      dispatch({ type: 'CLEAR' });
       navigate('/');
     }
   };
@@ -73,7 +71,7 @@ export default function SubmitForm() {
         headers: { 'Content-Type': 'application/json' },
       });
       reset();
-      await actions.resetAction();
+      dispatch({ type: 'CLEAR' });
       setPhenoPacket(await ret.json());
     }
   };

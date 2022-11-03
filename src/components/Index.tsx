@@ -5,19 +5,20 @@ import {
 } from '@heroicons/react/24/outline';
 import ContinueForm from './ContinueForm';
 import NavBar from './questionnaire/layouts/NavBar';
-import { useStateMachine } from 'little-state-machine';
-import resetAction from '../actions/resetAction';
+import { useContext } from 'react';
+import { AppContext } from '../context/AppContext';
 
 export default function Home() {
-  const { actions, state } = useStateMachine({ resetAction });
+  const { state, dispatch } = useContext(AppContext);
+
   const reset = () => {
     if (
       state.customFormData ||
-      state.phenoPacket.phenotypicFeatures?.length ||
-      state.files.length
+      state?.phenoPacket?.phenotypicFeatures?.length ||
+      state?.files?.length
     ) {
       if (confirm('Clear existing data?')) {
-        actions.resetAction();
+        dispatch({ type: 'CLEAR' });
       }
     }
   };
@@ -48,8 +49,8 @@ export default function Home() {
             </li>
           </ul>
           <p className="text-sm">
-            This app stores your provided form data in your browser's local
-            storage. By using this app you consent to this.
+            This app can store your provided form data in your browser's local
+            storage. You must accept functional cookies for this to work.
           </p>
         </div>
         <div className="flex flex-col md:flex-row md:divide-x divide-udni-teal">
@@ -61,9 +62,19 @@ export default function Home() {
             <p className="text-gray-600 text-sm">
               For physicians, geneticists. Start questionnare.
             </p>
+            <label className="mt-4">
+              <input
+                type="checkbox"
+                checked={state.autoSave}
+                onChange={(e) =>
+                  dispatch({ type: 'SET_AUTOSAVE', payload: e.target.checked })
+                }
+              />{' '}
+              Enable cookies for auto-save
+            </label>
             {state.customFormData ||
-            state.phenoPacket.phenotypicFeatures?.length ||
-            state.files.length ? (
+            state.phenoPacket?.phenotypicFeatures?.length ||
+            state.files?.length ? (
               <Link
                 to="/questionnaire"
                 className="border rounded p-3 px-6 mt-5 border-udni-teal text-udni-teal uppercase text-sm font-bold hover:bg-udni-teal hover:text-white"

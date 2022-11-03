@@ -1,21 +1,20 @@
-import { useStateMachine } from 'little-state-machine';
 import { ChevronUpIcon } from '@heroicons/react/24/solid';
-import resetAction from '../../actions/resetAction';
-import updateAction from '../../actions/updateAction';
 import { PhenotypicFeature } from '../../interfaces/phenopackets/schema/v2/core/phenotypic_feature';
 import { IFormSection } from '../../types';
 import { Disclosure } from '@headlessui/react';
 import tip2toeForm from '../../tip2toeform';
-import OntologyCard from '../common/OntologyCard';
 import NavButtons from './form/NavButtons';
 import { useNavigate } from 'react-router-dom';
+import Ontology from '../phenopacket/Ontology';
+import { useContext } from 'react';
+import { AppContext } from '../../context/AppContext';
 
 export default function Overview() {
-  const { actions, state } = useStateMachine({ updateAction, resetAction });
+  const { state, dispatch } = useContext(AppContext);
   const navigate = useNavigate();
   const reset = () => {
     if (confirm('Clear existing data?')) {
-      actions.resetAction();
+      dispatch({ type: 'CLEAR' });
       navigate('/');
     }
   };
@@ -90,7 +89,7 @@ function SectionPhenotypicFeatures({
           {filteredPhenotypicFeatures
             ?.filter((x) => !x.excluded)
             .map((pf, i) => (
-              <OntologyCard key={`st-${i}`} ontology={pf.type} />
+              <Ontology key={`st-${i}`} ontology={pf.type} />
             ))}
         </div>
         <div className="md:w-1/3">
@@ -98,7 +97,7 @@ function SectionPhenotypicFeatures({
           {filteredPhenotypicFeatures
             ?.filter((x) => x.excluded)
             .map((pf, i) => (
-              <OntologyCard key={`st-${i}`} ontology={pf.type} />
+              <Ontology key={`st-${i}`} ontology={pf.type} />
             ))}
         </div>
         <div className="md:w-1/3 text-slate-400">
@@ -110,7 +109,7 @@ function SectionPhenotypicFeatures({
                 !filteredPhenotypicFeatures?.some((pf) => pf.type?.id === x.id),
             )
             .map((ontology, i) => (
-              <OntologyCard key={`st-${i}`} ontology={ontology} />
+              <Ontology key={`st-${i}`} ontology={ontology} />
             ))}
         </div>
       </div>

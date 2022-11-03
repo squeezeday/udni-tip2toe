@@ -3,14 +3,12 @@ import {
   Sex,
   VitalStatus_Status,
 } from '../../interfaces/phenopackets/schema/v2/core/individual';
-import { ICustomFormData } from '../../types';
 interface IProps {
   individual: Individual;
-  customFormData?: ICustomFormData;
 }
 
-interface IQV {
-  question: string;
+interface Property {
+  label: string;
   value?: string;
 }
 
@@ -47,44 +45,25 @@ function getVitalStatus(status?: VitalStatus_Status) {
   }
 }
 
-export default function ViewIndividual({ individual, customFormData }: IProps) {
-  const answers: IQV[] = [
-    { question: 'Local UDP ID', value: individual.id },
-    { question: 'Biological Sex', value: getSex(individual.sex) },
+export default function ViewIndividual({ individual }: IProps) {
+  const properties: Property[] = [
+    { label: 'Local UDP ID', value: individual.id },
     {
-      question: 'Date of birth',
-      value: individual.dateOfBirth?.toString(),
+      label: 'Date of birth',
+      value: individual.dateOfBirth?.toLocaleDateString(),
     },
+    { label: 'Biological Sex', value: getSex(individual.sex) },
     {
-      question: 'Vital status',
+      label: 'Vital status',
       value: getVitalStatus(individual.vitalStatus?.status),
-    },
-    {
-      question: 'Age of mother at time of referral',
-      value: customFormData?.motherAge.toString(),
-    },
-    {
-      question: 'Age of father at time of referral',
-      value: customFormData?.fatherAge,
-    },
-    {
-      question: 'Ethnicity of patient',
-      value: customFormData?.ethnicity.toString(),
-    },
-    {
-      question: 'Referring UDP',
-      value: customFormData?.referringUdp.toString(),
     },
   ];
   return (
     <section>
-      {answers.map((x) => (
-        <div
-          className="flex flex-col print:flex-row md:flex-row"
-          key={x.question}
-        >
+      {properties.map((x) => (
+        <div className="flex flex-col print:flex-row md:flex-row" key={x.label}>
           <div className="w-full">
-            <h4 className="text-gray-500">{x.question}</h4>
+            <h4 className="text-gray-500">{x.value}</h4>
           </div>
           <div className="w-full">
             <p>{x.value}</p>

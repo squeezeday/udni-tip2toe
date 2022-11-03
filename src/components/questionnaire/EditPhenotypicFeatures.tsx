@@ -1,6 +1,6 @@
-import { useStateMachine } from 'little-state-machine';
-import { useState } from 'react';
-import updateAction from '../../actions/updateAction';
+import { useContext, useState } from 'react';
+import { AppContext } from '../../context/AppContext';
+import { OntologyClass } from '../../interfaces/phenopackets/schema/v2/core/base';
 import { PhenotypicFeature } from '../../interfaces/phenopackets/schema/v2/core/phenotypic_feature';
 import tip2toeForm from '../../tip2toeform';
 import { IFormSection, YesNoUnknown } from '../../types';
@@ -13,44 +13,22 @@ interface IProps {
   formSection: IFormSection;
 }
 export default function EditPhenotypicFeatures({ formSection }: IProps) {
-  const { actions, state } = useStateMachine({ updateAction });
+  const { state, dispatch } = useContext(AppContext);
 
-  const save = async (
-    ontologyTypeId: string,
-    value: YesNoUnknown,
-    label?: string,
-  ) => {
-    const phenotypicFeatures =
-      state.phenoPacket.phenotypicFeatures?.filter(
-        (x) => x.type?.id !== ontologyTypeId,
-      ) ?? [];
-    if (value !== 'unknown')
-      phenotypicFeatures.push({
-        type: {
-          id: ontologyTypeId,
-          label:
-            label ??
-            formSection?.ontologies?.find((x) => x.id === ontologyTypeId)
-              ?.label ??
-            '',
-        },
-        description: formSection?.ontologies?.some(
-          (x) => x.id === ontologyTypeId,
-        )
-          ? ''
-          : formSection?.slug ?? '', // handle custom term: save formSection.. TODO: better implementation needed
-        evidence: [],
-        excluded: value === 'no',
-        modifiers: [],
-        onset: undefined,
-        resolution: undefined,
-        severity: undefined,
+  const save = async (ontology: OntologyClass, value: YesNoUnknown) => {
+    if (value === 'unknown')
+      dispatch({
+        type: 'REMOVE_PHENOTYPIC_FEATURE',
+        payload: { ontologyTypeId: ontology.id },
       });
-
-    await actions.updateAction({
-      ...state,
-      phenoPacket: { ...state.phenoPacket, phenotypicFeatures },
-    });
+    else
+      dispatch({
+        type: 'SET_PHENOTYPIC_FEATURE',
+        payload: {
+          type: ontology,
+          excluded: value === 'no',
+        },
+      });
   };
 
   const setAllValues = async (value: YesNoUnknown) => {
@@ -63,9 +41,9 @@ export default function EditPhenotypicFeatures({ formSection }: IProps) {
             false,
         ) || []),
       ];
-      await actions.updateAction({
-        ...state,
-        phenoPacket: { ...state.phenoPacket, phenotypicFeatures },
+      dispatch({
+        type: 'SET_PHENOTYPIC_FEATURES',
+        payload: phenotypicFeatures,
       });
     } else {
       phenotypicFeatures = [
@@ -91,9 +69,9 @@ export default function EditPhenotypicFeatures({ formSection }: IProps) {
             } as PhenotypicFeature),
         ) || []),
       ];
-      await actions.updateAction({
-        ...state,
-        phenoPacket: { ...state.phenoPacket, phenotypicFeatures },
+      dispatch({
+        type: 'SET_PHENOTYPIC_FEATURES',
+        payload: phenotypicFeatures,
       });
     }
   };
@@ -103,14 +81,14 @@ export default function EditPhenotypicFeatures({ formSection }: IProps) {
   const onAddCustomTerm = async ({ term }: AddCustomTermFormModel) => {
     setMessage(`Looking up term ${term}...`);
     // check duplicate
-    const feature = formSection?.ontologies?.find((x) => x.id === term);
-    if (feature) {
+    const ontology = formSection?.ontologies?.find((x) => x.id === term);
+    if (ontology) {
       // setSelectedTerms((values) => [
       //   ...(values?.filter((x) => x.id !== term) ?? []),
       //   { term, value: 'yes' },
       // ]);
-      save(term, 'yes');
-      setMessage(`Added ${term}: ${feature.label}`);
+      save(ontology, 'yes');
+      setMessage(`Added ${term}: ${ontology.label}`);
       return;
     }
     // check if this term is available in some other formSection
@@ -131,7 +109,7 @@ export default function EditPhenotypicFeatures({ formSection }: IProps) {
         setMessage(error);
       } else {
         // add hpo term
-        save(term, 'yes', label);
+        save({ id: term, label: label || '' }, 'yes');
         setMessage(undefined);
       }
     } catch (error) {
@@ -184,7 +162,7 @@ export default function EditPhenotypicFeatures({ formSection }: IProps) {
                     ),
                   )}
                   onChange={(value) => {
-                    save(ontology.id, value);
+                    save(ontology, value);
                   }}
                 />
               </div>
@@ -227,7 +205,7 @@ export default function EditPhenotypicFeatures({ formSection }: IProps) {
                             ),
                           )}
                           onChange={(value) => {
-                            save(pf.type?.id || '', value, pf.type?.label);
+                            if (pf.type) save(pf.type, value);
                           }}
                         />
                       );
