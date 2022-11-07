@@ -8,8 +8,11 @@ const Input = React.forwardRef<
   {
     label: string;
     type: string;
+    className?: string;
+    min?: string | number;
+    max?: string | number;
   } & ReturnType<UseFormRegister<IIndividualFormData | ICustomFormData>>
->(({ onChange, onBlur, name, label, type }, ref) => (
+>(({ onChange, onBlur, name, label, type, className, min, max }, ref) => (
   <>
     <label htmlFor={name}>{label}</label>
     <input
@@ -17,9 +20,11 @@ const Input = React.forwardRef<
       type={type}
       id={name}
       ref={ref}
+      min={min}
+      max={max}
       onChange={onChange}
       onBlur={onBlur}
-      className="block p-2 rounded border border-gray-300 shadow-sm focus:border-udni-teal focus:ring-4 focus:outline-none focus:ring-udni-teal-100"
+      className={`block p-2 rounded border border-gray-300 shadow-sm focus:border-udni-teal focus:ring-4 focus:outline-none focus:ring-udni-teal-100 ${className}`}
     />
   </>
 ));

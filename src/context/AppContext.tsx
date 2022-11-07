@@ -2,7 +2,8 @@ import { createContext, useEffect, useMemo, useReducer } from 'react';
 import { Individual } from '../interfaces/phenopackets/schema/v2/core/individual';
 import { PhenotypicFeature } from '../interfaces/phenopackets/schema/v2/core/phenotypic_feature';
 import { Phenopacket } from '../interfaces/phenopackets/schema/v2/phenopackets';
-import { UploadedFile, ICustomFormData } from '../types';
+import { ICustomFormData } from '../types';
+import { File as PhenopacketFile } from '../interfaces/phenopackets/schema/v2/core/base';
 
 export type Action =
   | { type: 'CLEAR' }
@@ -23,21 +24,19 @@ export type Action =
       type: 'SET_PHENOPACKET';
       payload: Partial<Phenopacket>;
     }
-  | { type: 'REMOVE_FILE'; payload: UploadedFile }
-  | { type: 'ADD_FILE'; payload: UploadedFile }
+  | { type: 'REMOVE_FILE'; payload: PhenopacketFile }
+  | { type: 'ADD_FILE'; payload: PhenopacketFile }
   | { type: 'CUSTOM_FORM_DATA'; payload: ICustomFormData }
   | { type: 'SET_AUTOSAVE'; payload: boolean };
 
 export interface IAppContext {
   phenoPacket: Partial<Phenopacket>;
-  files: UploadedFile[];
   autoSave: boolean;
   customFormData?: ICustomFormData;
 }
 
 const emptyState: IAppContext = {
   phenoPacket: {},
-  files: [],
   autoSave: false,
 };
 
@@ -106,16 +105,23 @@ const appReducer = (state: IAppContext, action: Action) => {
     case 'ADD_FILE':
       return {
         ...state,
-        files: [...state.files, action.payload as UploadedFile],
+        phenoPacket: {
+          ...state.phenoPacket,
+          files: [
+            ...(state.phenoPacket.files || []),
+            action.payload as PhenopacketFile,
+          ],
+        },
       };
     case 'REMOVE_FILE':
       return {
         ...state,
-        files: [
-          ...state.files.filter(
-            (x) => x._id !== (action.payload as UploadedFile)._id,
+        phenoPacket: {
+          ...state.phenoPacket,
+          files: state.phenoPacket.files?.filter(
+            (x) => x.uri !== action.payload.uri,
           ),
-        ],
+        },
       };
     case 'CUSTOM_FORM_DATA':
       return {

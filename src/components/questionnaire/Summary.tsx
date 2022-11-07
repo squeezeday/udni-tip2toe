@@ -6,6 +6,8 @@ import ViewIndividual from './ViewIndividual';
 import NavButtons from './form/NavButtons';
 import { useContext } from 'react';
 import { AppContext } from '../../context/AppContext';
+import SubmitForm from './SubmitForm';
+import ViewPhotographs from './uploads/ViewPhotographs';
 
 export default function Summary() {
   const { state } = useContext(AppContext);
@@ -19,7 +21,7 @@ export default function Summary() {
         <PrinterIcon className="w-4 h-4 mr-2" />
         Print
       </button>
-      <ViewFormSection slug="photographs" />
+      <ViewPhotographs />
       <ViewFormSection
         slug="this-is-me"
         customFormData={state.customFormData || {}}
@@ -55,7 +57,8 @@ export default function Summary() {
       {tip2toeForm.formSections
         ?.filter(
           (x) =>
-            x.questions?.length &&
+            (x.questions?.length || x.uploadSections?.length) &&
+            x.slug !== 'photographs' &&
             x.slug !== 'clinical-findings' &&
             x.slug !== 'this-is-me',
         )
@@ -68,6 +71,9 @@ export default function Summary() {
             />
           );
         })}
+
+      <SubmitForm />
+
       <NavButtons />
     </>
   );

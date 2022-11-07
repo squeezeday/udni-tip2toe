@@ -39,7 +39,6 @@ export interface UploadedFile {
   size: number;
   mimetype: string;
   url: string;
-  section: string;
 }
 
 export interface ICustomFormData {

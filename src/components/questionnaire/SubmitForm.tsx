@@ -1,10 +1,11 @@
+import { ChevronRightIcon } from '@heroicons/react/24/outline';
 import { useContext, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { AppContext } from '../../context/AppContext';
-import { File as PhenopacketFile } from '../../interfaces/phenopackets/schema/v2/core/base';
 import { Phenopacket } from '../../interfaces/phenopackets/schema/v2/phenopackets';
 import { PhenopacketEntity } from '../../types';
+import Spinner from '../common/Spinner';
 
 interface ISummaryFormModel {
   acceptTerms: boolean;
@@ -33,18 +34,15 @@ export default function SubmitForm() {
   };
 
   const onSubmit = async () => {
-    const data: Partial<Phenopacket> = {
+    const dto: Partial<Phenopacket> = {
       ...state.phenoPacket,
-      files: state.files.map(
-        (file) =>
-          ({
-            uri: file.url,
-            fileAttributes: { description: file.section },
-            individualToFileIdentifiers: {},
-          } as PhenopacketFile),
-      ),
       metaData: {
-        created: new Date(),
+        // protobuf timestamp hack
+        created: {
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          seconds: new Date().getTime(),
+        },
         createdBy: 'UDNI frontend',
         submittedBy: 'UDNI frontend',
         updates: [],
@@ -63,16 +61,38 @@ export default function SubmitForm() {
       },
     };
 
-    if (import.meta.env.VITE_APIURL) {
-      const url = `${import.meta.env.VITE_APIURL}/api/v1/phenopacket`;
-      const ret = await fetch(url, {
+    // protobuf timestamp hack
+    if (dto.subject?.dateOfBirth) {
+      dto.subject.dateOfBirth = {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        seconds: new Date(dto.subject.dateOfBirth).getTime(),
+      };
+    }
+
+    const VITE_APIURL = import.meta.env.VITE_APIURL;
+    if (VITE_APIURL) {
+      const res = await fetch(`${VITE_APIURL}/api/v1/phenopacket`, {
         method: 'POST',
-        body: JSON.stringify(data),
+        body: JSON.stringify(dto),
         headers: { 'Content-Type': 'application/json' },
       });
-      reset();
-      dispatch({ type: 'CLEAR' });
-      setPhenoPacket(await ret.json());
+
+      if (!res.ok) {
+        throw new Error('Error submitting phenopacket');
+      }
+
+      const ret = (await res.json()) as PhenopacketEntity;
+      setPhenoPacket(ret);
+
+      await fetch(`${VITE_APIURL}/api/v1/formdata`, {
+        method: 'POST',
+        body: JSON.stringify({
+          ...state.customFormData,
+          phenopacketId: ret._id,
+        }),
+        headers: { 'Content-Type': 'application/json' },
+      });
     }
   };
 
@@ -100,17 +120,22 @@ export default function SubmitForm() {
   };
 
   return (
-    <>
+    <div className="print:hidden">
       {getSubmissionStatus()}
       {phenoPacket ? (
-        <div>
+        <>
           <Link
-            to={`/phenopacket/${phenoPacket?._id}`}
-            className="btn inline-block my-4"
+            className=" my-2 inline-flex border rounded p-2 px-4  border-udni-teal text-udni-teal uppercase text-sm font-bold hover:bg-udni-teal hover:text-white"
+            to="/"
+            onClick={() => {
+              reset();
+              dispatch({ type: 'CLEAR' });
+            }}
           >
-            View phenopacket
+            Clear form and go to front page{' '}
+            <ChevronRightIcon className="w-4 ml-1 flex-none" />
           </Link>
-        </div>
+        </>
       ) : (
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="md:flex  my-4">
@@ -132,7 +157,8 @@ export default function SubmitForm() {
                 !state.phenoPacket?.phenotypicFeatures?.length
               }
             >
-              {isSubmitting ? 'Submitting form...' : 'Submit form'}
+              {isSubmitting ? 'Submitting form... ' : 'Submit form'}
+              {isSubmitting && <Spinner />}
             </button>
           </div>
           <button
@@ -147,6 +173,6 @@ export default function SubmitForm() {
           {getSubmissionStatus()}
         </form>
       )}
-    </>
+    </div>
   );
 }

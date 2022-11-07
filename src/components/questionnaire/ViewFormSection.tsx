@@ -13,11 +13,18 @@ export default function ViewFormSection(props: IProps) {
     props.formSection ||
     tip2toeForm.formSections?.find((x) => x.slug === props.slug);
   if (!formSection) return null;
+  const questions = formSection.questions?.filter(
+    (question) =>
+      props.customFormData &&
+      props.customFormData[question.name] &&
+      props.customFormData[question.name].length,
+  );
+
   return (
     <>
       <section key={formSection.slug}>
         <h3>{formSection.title}</h3>
-        {formSection.questions?.map((question) => (
+        {questions?.map((question) => (
           <div
             key={question.name}
             className="flex flex-col print:flex-row md:flex-row"

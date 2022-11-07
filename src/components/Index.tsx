@@ -14,8 +14,7 @@ export default function Home() {
   const reset = () => {
     if (
       state.customFormData ||
-      state?.phenoPacket?.phenotypicFeatures?.length ||
-      state?.files?.length
+      state?.phenoPacket?.phenotypicFeatures?.length
     ) {
       if (confirm('Clear existing data?')) {
         dispatch({ type: 'CLEAR' });
@@ -73,8 +72,7 @@ export default function Home() {
               Enable cookies for auto-save
             </label>
             {state.customFormData ||
-            state.phenoPacket?.phenotypicFeatures?.length ||
-            state.files?.length ? (
+            state.phenoPacket?.phenotypicFeatures?.length ? (
               <Link
                 to="/questionnaire"
                 className="border rounded p-3 px-6 mt-5 border-udni-teal text-udni-teal uppercase text-sm font-bold hover:bg-udni-teal hover:text-white"

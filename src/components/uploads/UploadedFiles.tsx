@@ -10,19 +10,20 @@ export default function UploadedFiles({ section }: IProps) {
 
   return (
     <>
-      {state.files && state.files.length > 0 ? <h3>Uploaded files</h3> : null}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {state.files
-          ?.filter((x) => x.section === section)
+        {state.phenoPacket?.files
+          ?.filter((x) => x.fileAttributes['section'] === section)
           .map((file) => (
-            <div
-              className="relative h-52 flex items-center justify-center"
-              key={file._id}
+            <figure
+              className="relative h-52 w-52 flex items-center justify-center"
+              key={file.uri}
             >
-              {file.mimetype?.toLowerCase().startsWith('image/') && (
+              {file.fileAttributes['mimetype']
+                .toLowerCase()
+                .startsWith('image/') && (
                 <img
-                  src={`${file.url}`}
-                  className="object-contain max-h-full"
+                  src={`${file.uri}`}
+                  className="object-contain max-h-full max-w-full"
                 />
               )}
               <button
@@ -33,7 +34,7 @@ export default function UploadedFiles({ section }: IProps) {
               >
                 <MinusCircleIcon className="h-4 w-4" /> Remove
               </button>
-            </div>
+            </figure>
           ))}
       </div>
     </>

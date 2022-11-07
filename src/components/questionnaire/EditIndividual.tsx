@@ -63,7 +63,7 @@ export default function EditIndividual() {
       <div className="my-4">
         <Select
           label="Biological sex"
-          {...register('subject.sex')}
+          {...register('subject.sex', { valueAsNumber: true })}
           options={[
             { value: Sex.UNKNOWN_SEX.toString(), label: 'Unknown' },
             { value: Sex.MALE.toString(), label: 'Male' },
@@ -78,7 +78,7 @@ export default function EditIndividual() {
       </div>
       <div className="my-4">
         <Select
-          {...register('subject.vitalStatus.status')}
+          {...register('subject.vitalStatus.status', { valueAsNumber: true })}
           label="Vital status"
           options={[
             {
@@ -107,7 +107,24 @@ export default function EditIndividual() {
         )}
       </div>
       <div className="my-4">
-        {/* <YearMonthPicker {...register('customFormData.ageAtOnset')} /> */}
+        <p>Age at symptom onset</p>
+        <div className="flex space-x-2 items-center">
+          <Input
+            type="number"
+            min={0}
+            label="Years"
+            className="w-20"
+            {...register('customFormData.ageSymptomYears')}
+          />
+          <Input
+            type="number"
+            min={0}
+            max={12}
+            label="Months"
+            className="w-20"
+            {...register('customFormData.ageSymptomMonths')}
+          />
+        </div>
       </div>
       <div className="my-4">
         <Input
@@ -144,13 +161,6 @@ export default function EditIndividual() {
           </p>
         )}
       </div>
-      {/* <div className="my-4">
-        <label htmlFor="onsetAge" className="">
-          Age at symptom onset
-        </label>
-        <select name="onsetAge"></select>
-        {errors?.onsetAge && <p className="text-red-500">{errors.id.message}</p>}
-      </div> */}
       <div className="my-4">
         <label htmlFor="customFormData.referringUdp">Referring UDP</label>
         <textarea

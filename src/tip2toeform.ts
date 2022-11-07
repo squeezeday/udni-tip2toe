@@ -48,14 +48,14 @@ const formSections: IFormSection[] = [
         ],
       },
       {
-        title: "The patient's parents are consanguineous",
+        title: "The patient's parents are consanguineous?",
         name: 'parentsConsanguineous',
         options: ['Yes', 'No'],
         type: 'select',
       },
       {
         title:
-          'Another relative affected with the same diagnosis as the patient? If Yes, indicate relationship(should be  possible to add  multiple relatives)',
+          'Another relative affected with the same diagnosis as the patient? If Yes, indicate relationship.',
         name: 'relativeAffected',
         type: 'selectMultiple',
         options: [

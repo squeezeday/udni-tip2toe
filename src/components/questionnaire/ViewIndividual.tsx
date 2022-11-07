@@ -56,6 +56,18 @@ export default function ViewIndividual({ individual, customFormData }: IProps) {
       value: individual.dateOfBirth?.toString(),
     },
     {
+      question: 'Age at symptom onset',
+      value: `${
+        customFormData?.ageSymptomYears
+          ? customFormData?.ageSymptomYears + ' years '
+          : ''
+      }${
+        customFormData?.ageSymptomMonths
+          ? customFormData?.ageSymptomMonths + ' months'
+          : ''
+      }`,
+    },
+    {
       question: 'Vital status',
       value: getVitalStatus(individual.vitalStatus?.status),
     },
@@ -78,19 +90,21 @@ export default function ViewIndividual({ individual, customFormData }: IProps) {
   ];
   return (
     <section>
-      {answers.map((x) => (
-        <div
-          className="flex flex-col print:flex-row md:flex-row"
-          key={x.question}
-        >
-          <div className="w-full">
-            <h4 className="text-gray-500">{x.question}</h4>
+      {answers
+        .filter((x) => x.question && x.value)
+        .map((x) => (
+          <div
+            className="flex flex-col print:flex-row md:flex-row"
+            key={x.question}
+          >
+            <div className="w-full">
+              <h4 className="text-gray-500">{x.question}</h4>
+            </div>
+            <div className="w-full">
+              <p>{x.value}</p>
+            </div>
           </div>
-          <div className="w-full">
-            <p>{x.value}</p>
-          </div>
-        </div>
-      ))}
+        ))}
     </section>
   );
 }
