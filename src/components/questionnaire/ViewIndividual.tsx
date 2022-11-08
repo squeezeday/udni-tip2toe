@@ -90,6 +90,7 @@ export default function ViewIndividual({ individual, customFormData }: IProps) {
   ];
   return (
     <section>
+      <h2 style={{ pageBreakBefore: 'always' }}>This is {individual.id}</h2>
       {answers
         .filter((x) => x.question && x.value)
         .map((x) => (
@@ -98,7 +99,7 @@ export default function ViewIndividual({ individual, customFormData }: IProps) {
             key={x.question}
           >
             <div className="w-full">
-              <h4 className="text-gray-500">{x.question}</h4>
+              <h4 className="text-gray-500 m-0">{x.question}</h4>
             </div>
             <div className="w-full">
               <p>{x.value}</p>

@@ -3,13 +3,11 @@ import Help from './components/Help';
 import Index from './components/Index';
 import NotFound from './components/NotFound';
 import EditIndividual from './components/questionnaire/EditIndividual';
-import Summary from './components/questionnaire/Summary';
 import QuestionnaireLayout from './components/questionnaire/layouts/Layout';
 import Questionnaire from './components/questionnaire/Index';
 import FormSectionPage from './components/questionnaire/FormSectionPage';
 import { AppProvider } from './context/AppContext';
-
-// createStore({ phenoPacket: {}, files: [] }, { storageType: localStorage });
+import SummaryPage from './components/questionnaire/SummaryPage';
 
 function App() {
   return (
@@ -23,7 +21,7 @@ function App() {
             <Route path="overview" element={<Questionnaire />} />
             <Route path="individual" element={<EditIndividual />} />
             <Route path=":slug" element={<FormSectionPage />} />
-            <Route path="summary" element={<Summary />} />
+            <Route path="summary" element={<SummaryPage />} />
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>

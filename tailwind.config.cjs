@@ -8,7 +8,7 @@ module.exports = {
         'udni-teal-200': '#91E7F2',
         'udni-teal-400': '#48D7EA',
         'udni-teal': '#18B6CC',
-        'udni-purple': '#4F5C5F',
+        'udni-purple': '#A6418E',
       },
       fontSize: {
         base: '14px',

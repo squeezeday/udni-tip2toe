@@ -4,20 +4,12 @@ import { IFormSection } from '../../types';
 import { Disclosure } from '@headlessui/react';
 import tip2toeForm from '../../tip2toeform';
 import NavButtons from './form/NavButtons';
-import { useNavigate } from 'react-router-dom';
 import Ontology from '../phenopacket/Ontology';
 import { useContext } from 'react';
 import { AppContext } from '../../context/AppContext';
 
 export default function Overview() {
-  const { state, dispatch } = useContext(AppContext);
-  const navigate = useNavigate();
-  const reset = () => {
-    if (confirm('Clear existing data?')) {
-      dispatch({ type: 'CLEAR' });
-      navigate('/');
-    }
-  };
+  const { state } = useContext(AppContext);
 
   return (
     <>
@@ -52,12 +44,7 @@ export default function Overview() {
           </Disclosure>
         );
       })}
-      <button
-        onClick={reset}
-        className="mt-4 border border-gray-500 text-gray-500 hover:text-gray-700 hover:border-gray-700 rounded p-2"
-      >
-        Reset form
-      </button>
+
       <NavButtons />
     </>
   );

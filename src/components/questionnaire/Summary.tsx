@@ -1,54 +1,49 @@
 import PhenotypicFeaturesList from '../summary/PhenotypicFeaturesList';
-import { PrinterIcon } from '@heroicons/react/24/outline';
 import tip2toeForm from '../../tip2toeform';
 import ViewFormSection from './ViewFormSection';
 import ViewIndividual from './ViewIndividual';
-import NavButtons from './form/NavButtons';
-import { useContext } from 'react';
-import { AppContext } from '../../context/AppContext';
-import SubmitForm from './SubmitForm';
 import ViewPhotographs from './uploads/ViewPhotographs';
+import { Phenopacket } from '../../interfaces/phenopackets/schema/v2/phenopackets';
+import { ICustomFormData } from '../../types';
 
-export default function Summary() {
-  const { state } = useContext(AppContext);
-
+interface IProps {
+  phenoPacket: Partial<Phenopacket>;
+  customFormData?: ICustomFormData;
+}
+export default function Summary({ phenoPacket, customFormData }: IProps) {
   return (
-    <>
-      <button
-        onClick={() => window.print()}
-        className="ml-auto print:hidden flex items-center border rounded p-2 px-4  border-udni-teal text-udni-teal uppercase text-sm font-bold hover:bg-udni-teal hover:text-white"
-      >
-        <PrinterIcon className="w-4 h-4 mr-2" />
-        Print
-      </button>
-      <ViewPhotographs />
+    <article className="summary divide-y space-y-4">
+      <ViewPhotographs
+        files={phenoPacket?.files?.filter((x) =>
+          x.fileAttributes['section'].startsWith('photographs'),
+        )}
+        // onRemove={(file) => dispatch({ type: 'REMOVE_FILE', payload: file })}
+      />
       <ViewFormSection
         slug="this-is-me"
-        customFormData={state.customFormData || {}}
+        customFormData={customFormData || {}}
+        phenoPacket={phenoPacket}
       />
-      <h2 style={{ pageBreakBefore: 'always' }}>
-        This is {state.phenoPacket.subject?.id}
-      </h2>
-      {state.phenoPacket.subject ? (
+      {phenoPacket.subject ? (
         <ViewIndividual
-          individual={state.phenoPacket.subject}
-          customFormData={state.customFormData}
+          individual={phenoPacket.subject}
+          customFormData={customFormData}
         />
       ) : null}
       <ViewFormSection
         slug="clinical-findings"
-        customFormData={state.customFormData || {}}
+        customFormData={customFormData || {}}
+        phenoPacket={phenoPacket}
       />
-      <section>
-        <h2>HPO Summary</h2>
+      <section className="my-4">
         <h3>Phenotypic features</h3>
         <PhenotypicFeaturesList
-          phenotypicFeatures={state.phenoPacket.phenotypicFeatures?.filter(
+          phenotypicFeatures={phenoPacket.phenotypicFeatures?.filter(
             (x) => !x.excluded,
           )}
         />
         <PhenotypicFeaturesList
-          phenotypicFeatures={state.phenoPacket.phenotypicFeatures?.filter(
+          phenotypicFeatures={phenoPacket.phenotypicFeatures?.filter(
             (x) => x.excluded,
           )}
         />
@@ -67,14 +62,11 @@ export default function Summary() {
             <ViewFormSection
               formSection={formSection}
               key={formSection.slug}
-              customFormData={state.customFormData || {}}
+              customFormData={customFormData || {}}
+              phenoPacket={phenoPacket}
             />
           );
         })}
-
-      <SubmitForm />
-
-      <NavButtons />
-    </>
+    </article>
   );
 }

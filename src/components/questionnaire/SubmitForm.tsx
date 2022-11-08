@@ -162,7 +162,7 @@ export default function SubmitForm() {
             </button>
           </div>
           <button
-            className="text-xs  text-slate-500 hover:text-slate-700"
+            className="text-xs border p-2 border-gray-400 text-gray-400 hover:text-gray-700 hover:border-gray-700 rounded"
             onClick={async (e) => {
               e.preventDefault();
               resetForm();
