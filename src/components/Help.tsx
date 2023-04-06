@@ -14,8 +14,15 @@ export default function Help() {
         <h3>Source code/license</h3>
         <p>
           Source code is licensed MIT, available at{' '}
-          <a href="https://github.com/squeezeday/udni-frontend">
-            https://github.com/squeezeday/udni-frontend
+          <a href="https://github.com/squeezeday/udni-tip2toe">
+            https://github.com/squeezeday/udni-tip2toe
+          </a>{' '}
+        </p>
+        <h3>Backend source code/license</h3>
+        <p>
+          Source code is licensed MIT, available at{' '}
+          <a href="https://github.com/squeezeday/phenopacket-api">
+            https://github.com/squeezeday/phenopacket-api
           </a>{' '}
         </p>
         <h3>Human Phenotype Ontology</h3>
