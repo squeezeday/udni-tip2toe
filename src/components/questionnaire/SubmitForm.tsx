@@ -108,7 +108,7 @@ export default function SubmitForm() {
           <p className="bg-blue-100 text-blue-500 p-4 rounded">
             Your form has been submitted successfully and was assigned ID{' '}
             {phenoPacket?._id}
-            <br>Your phenopacket is available for fetching from the backend with hash{' '}
+            <br/>Your phenopacket is available for fetching from the backend with hash{' '}
             {phenoPacket?._hash}
           </p>
         ) : null}
