@@ -99,11 +99,6 @@ export default function SubmitForm() {
   const getSubmissionStatus = () => {
     return (
       <>
-        {isSubmitting ? (
-          <p className="bg-blue-100 text-blue-500 p-4 rounded">
-            Submitting form..
-          </p>
-        ) : null}
         {isSubmitted && isSubmitSuccessful ? (
           <p className="bg-blue-100 text-blue-500 p-4 rounded">
             Your form has been submitted successfully and was assigned ID{' '}
