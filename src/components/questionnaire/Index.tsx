@@ -1,5 +1,3 @@
-import Overview from './Overview';
-
 export default function Questionnaire() {
   return (
     <div>
@@ -9,8 +7,8 @@ export default function Questionnaire() {
         obtain. In this case the local UDP referral should write "Not
         investigated".
       </p>
-      <h3 className="mt-4">Overview</h3>
-      <Overview />
+
+      {/* <Overview /> */}
     </div>
   );
 }

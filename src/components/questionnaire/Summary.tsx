@@ -1,6 +1,6 @@
-import PhenotypicFeaturesList from '../summary/PhenotypicFeaturesList';
+import PhenotypicFeaturesList from './summary/PhenotypicFeaturesList';
 import tip2toeForm from '../../tip2toeform';
-import ViewFormSection from './ViewFormSection';
+import ViewFormSection from './summary/ViewFormSection';
 import ViewIndividual from './ViewIndividual';
 import ViewPhotographs from './uploads/ViewPhotographs';
 import { Phenopacket } from '../../interfaces/phenopackets/schema/v2/phenopackets';

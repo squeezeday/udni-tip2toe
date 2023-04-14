@@ -59,7 +59,7 @@ export default function ViewIndividual({ individual }: IProps) {
     },
   ];
   return (
-    <section>
+    <>
       {properties.map((x) => (
         <div className="flex flex-col print:flex-row md:flex-row" key={x.label}>
           <div className="w-full">
@@ -70,6 +70,6 @@ export default function ViewIndividual({ individual }: IProps) {
           </div>
         </div>
       ))}
-    </section>
+    </>
   );
 }

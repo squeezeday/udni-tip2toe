@@ -10,27 +10,27 @@ interface IProps {
 }
 
 export default function FormSection({ formSection }: IProps) {
+  const { title, description, questions, uploadSections, ontologies, slug } =
+    formSection;
   return (
     <>
-      <h2>{formSection?.title}</h2>
-      {formSection.description ? (
-        <ReactMarkdown children={formSection.description}></ReactMarkdown>
+      <h2>{title}</h2>
+      {description ? (
+        <ReactMarkdown children={description}></ReactMarkdown>
       ) : null}
-      {formSection?.uploadSections ? (
+      {uploadSections ? (
         <div>
-          {formSection.uploadSections.map((x) => (
+          {uploadSections.map((x) => (
             <div key={x}>
               <h4>{x}</h4>
-              <UploadWidget section={`${formSection.slug}:${x}`} />
+              <UploadWidget section={`${slug}:${x}`} />
             </div>
           ))}
           <NavButtons />
         </div>
       ) : null}
-      {formSection.questions ? <Questions formSection={formSection} /> : null}
-      {formSection.ontologies ? (
-        <EditPhenotypicFeatures formSection={formSection} />
-      ) : null}
+      <Questions questions={questions} />
+      <EditPhenotypicFeatures ontologies={ontologies} slug={slug} />
     </>
   );
 }

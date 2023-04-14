@@ -2,7 +2,7 @@ import { useContext } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { AppContext } from '../../../context/AppContext';
-import { ICustomFormData, IFormSection } from '../../../types';
+import { ICustomFormData, IQuestion } from '../../../types';
 import Input from '../../individual/Input';
 import Select from '../../individual/Select';
 import TextArea from '../../individual/TextArea';
@@ -10,9 +10,9 @@ import { useNextUrl } from '../layouts/Layout';
 import NextButton from './NextButton';
 
 interface IProps {
-  formSection: IFormSection;
+  questions?: IQuestion[];
 }
-export default function Questions({ formSection }: IProps) {
+export default function Questions({ questions }: IProps) {
   const { state, dispatch } = useContext(AppContext);
   const { nextUrl } = useNextUrl();
   const navigate = useNavigate();
@@ -27,7 +27,7 @@ export default function Questions({ formSection }: IProps) {
   };
   return (
     <form onSubmit={handleSubmit(doSubmit)} className="my-5">
-      {formSection?.questions?.map(({ title, name, options, type }) => {
+      {questions?.map(({ title, name, options, type }) => {
         switch (type) {
           case 'selectMultiple':
           case 'select':
@@ -41,39 +41,27 @@ export default function Questions({ formSection }: IProps) {
                 />
               </div>
             );
-            break;
           case 'text':
             return (
               <div className="my-4" key={name}>
                 <Input type="text" {...register(name)} label={title} />
               </div>
             );
-            break;
           case 'number':
             return (
               <div className="my-4" key={name}>
                 <Input type="number" {...register(name)} label={title} />
               </div>
             );
-            break;
           case 'date':
             return (
               <div className="my-4" key={name}>
                 <Input type="date" {...register(name)} label={title} />
               </div>
             );
-            break;
         }
         return (
           <TextArea label={title} name={name} key={name} register={register} />
-          // <div className="my-4" key={name}>
-          //   <label htmlFor={name}>{title}</label>
-          //   <textarea
-          //     id={name}
-          //     {...register(name)}
-          //     className="block p-2 w-full rounded border border-gray-300 shadow-sm focus:border-udni-teal focus:ring-4 focus:outline-none focus:ring-udni-teal-100"
-          //   ></textarea>
-          // </div>
         );
       })}
       <NextButton />

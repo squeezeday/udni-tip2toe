@@ -2,11 +2,17 @@ import { OntologyClass } from './interfaces/phenopackets/schema/v2/core/base';
 import { Phenopacket } from './interfaces/phenopackets/schema/v2/phenopackets';
 
 export type YesNoUnknown = 'yes' | 'no' | 'unknown';
-
+export type QuestionType =
+  | 'text'
+  | 'longText'
+  | 'number'
+  | 'select'
+  | 'selectMultiple'
+  | 'date';
 export interface IQuestion {
   title: string;
   name: string;
-  type: 'text' | 'longText' | 'number' | 'select' | 'selectMultiple' | 'date';
+  type: QuestionType;
   options?: string[];
 }
 export interface IForm {

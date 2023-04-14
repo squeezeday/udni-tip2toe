@@ -5,8 +5,8 @@ interface IProps {
 }
 export default function Ontology({ ontology }: IProps) {
   return (
-    <p>
+    <>
       <strong>{ontology?.id}</strong> {ontology?.label}
-    </p>
+    </>
   );
 }

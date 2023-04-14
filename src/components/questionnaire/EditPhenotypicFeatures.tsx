@@ -3,16 +3,17 @@ import { AppContext } from '../../context/AppContext';
 import { OntologyClass } from '../../interfaces/phenopackets/schema/v2/core/base';
 import { PhenotypicFeature } from '../../interfaces/phenopackets/schema/v2/core/phenotypic_feature';
 import tip2toeForm from '../../tip2toeform';
-import { IFormSection, YesNoUnknown } from '../../types';
+import { YesNoUnknown } from '../../types';
 import { lookupHpoTerm } from '../../utils/lookupHpoTerm';
 import AddCustomTerm, { AddCustomTermFormModel } from './form/AddCustomTerm';
 import EditPhenotypicFeature from './form/EditPhenotypicFeature';
 import NavButtons from './form/NavButtons';
 
 interface IProps {
-  formSection: IFormSection;
+  slug: string;
+  ontologies?: OntologyClass[];
 }
-export default function EditPhenotypicFeatures({ formSection }: IProps) {
+export default function EditPhenotypicFeatures({ slug, ontologies }: IProps) {
   const { state, dispatch } = useContext(AppContext);
 
   const save = async (ontology: OntologyClass, value: YesNoUnknown) => {
@@ -36,9 +37,7 @@ export default function EditPhenotypicFeatures({ formSection }: IProps) {
     if (value === 'unknown') {
       phenotypicFeatures = [
         ...(state.phenoPacket?.phenotypicFeatures?.filter(
-          (st) =>
-            formSection?.ontologies?.some((sf) => sf.id === st.type?.id) ===
-            false,
+          (st) => ontologies?.some((sf) => sf.id === st.type?.id) === false,
         ) || []),
       ];
       dispatch({
@@ -48,11 +47,9 @@ export default function EditPhenotypicFeatures({ formSection }: IProps) {
     } else {
       phenotypicFeatures = [
         ...(state.phenoPacket?.phenotypicFeatures?.filter(
-          (st) =>
-            formSection?.ontologies?.some((sf) => sf.id === st.type?.id) ===
-            false,
+          (st) => ontologies?.some((sf) => sf.id === st.type?.id) === false,
         ) || []),
-        ...(formSection?.ontologies?.map(
+        ...(ontologies?.map(
           (x) =>
             ({
               type: {
@@ -81,7 +78,7 @@ export default function EditPhenotypicFeatures({ formSection }: IProps) {
   const onAddCustomTerm = async ({ term }: AddCustomTermFormModel) => {
     setMessage(`Looking up term ${term}...`);
     // check duplicate
-    const ontology = formSection?.ontologies?.find((x) => x.id === term);
+    const ontology = ontologies?.find((x) => x.id === term);
     if (ontology) {
       // setSelectedTerms((values) => [
       //   ...(values?.filter((x) => x.id !== term) ?? []),
@@ -148,73 +145,67 @@ export default function EditPhenotypicFeatures({ formSection }: IProps) {
       Next <ChevronRightIcon className="w-4 ml-1" />
     </button> */}
       </div>
-      {formSection && (
-        <fieldset className="mt-4 divide-y divide-gray-300">
-          {formSection?.ontologies
-            ?.filter((x) => x.id !== 'other')
-            .map((ontology) => (
-              <div key={`feature-${ontology.id}`} className="py-4">
-                <EditPhenotypicFeature
-                  ontology={ontology}
-                  value={getYesNoUnknown(
-                    state?.phenoPacket?.phenotypicFeatures?.find(
-                      (x) => x.type?.id === ontology.id,
-                    ),
-                  )}
-                  onChange={(value) => {
-                    save(ontology, value);
-                  }}
-                />
-              </div>
-            ))}
-          {formSection?.ontologies
-            ?.filter((x) => x.id === 'other')
-            .map(({ label }) => (
-              <div className="py-4" key={`chk-other`}>
-                <p className="my-2">{label}</p>
-                <AddCustomTerm
-                  onSubmit={onAddCustomTerm}
-                  key={`act-${formSection?.slug}`}
-                />
-                {message && (
-                  <p
-                    key={`act-msg-${formSection?.slug}`}
-                    onClick={() => setMessage(undefined)}
-                  >
-                    {message}
-                  </p>
+      <fieldset className="mt-4 divide-y divide-gray-300">
+        {ontologies
+          ?.filter((x) => x.id !== 'other')
+          .map((ontology) => (
+            <div key={`feature-${ontology.id}`} className="py-4">
+              <EditPhenotypicFeature
+                ontology={ontology}
+                value={getYesNoUnknown(
+                  state?.phenoPacket?.phenotypicFeatures?.find(
+                    (x) => x.type?.id === ontology.id,
+                  ),
                 )}
+                onChange={(value) => {
+                  save(ontology, value);
+                }}
+              />
+            </div>
+          ))}
+        {ontologies
+          ?.filter((x) => x.id === 'other')
+          .map(({ label }) => (
+            <div className="py-4" key={`chk-other`}>
+              <p className="my-2">{label}</p>
+              <AddCustomTerm onSubmit={onAddCustomTerm} key={`act-${slug}`} />
+              {message && (
+                <p
+                  key={`act-msg-${slug}`}
+                  onClick={() => setMessage(undefined)}
+                >
+                  {message}
+                </p>
+              )}
 
-                <div className="mt-4 divide-y divide-gray-300">
-                  {state.phenoPacket?.phenotypicFeatures
-                    ?.filter(
-                      (st) =>
-                        formSection?.ontologies?.some(
-                          (sf) => sf.id === st.type?.id,
-                        ) === false && st.description === formSection?.slug,
-                    )
-                    .map((pf, i) => {
-                      if (!pf.type) return null;
-                      return (
-                        <EditPhenotypicFeature
-                          key={`et-${pf.type?.id}-${i}`}
-                          ontology={pf.type}
-                          value={getYesNoUnknown(
-                            state?.phenoPacket?.phenotypicFeatures?.find(
-                              (x) => x.type?.id === pf.type?.id,
-                            ),
-                          )}
-                          onChange={(value) => {
-                            if (pf.type) save(pf.type, value);
-                          }}
-                        />
-                      );
-                    })}
-                </div>
+              <div className="mt-4 divide-y divide-gray-300">
+                {state.phenoPacket?.phenotypicFeatures
+                  ?.filter(
+                    (st) =>
+                      ontologies?.some((sf) => sf.id === st.type?.id) ===
+                        false && st.description === slug,
+                  )
+                  .map((pf, i) => {
+                    if (!pf.type) return null;
+                    return (
+                      <EditPhenotypicFeature
+                        key={`et-${pf.type?.id}-${i}`}
+                        ontology={pf.type}
+                        value={getYesNoUnknown(
+                          state?.phenoPacket?.phenotypicFeatures?.find(
+                            (x) => x.type?.id === pf.type?.id,
+                          ),
+                        )}
+                        onChange={(value) => {
+                          if (pf.type) save(pf.type, value);
+                        }}
+                      />
+                    );
+                  })}
               </div>
-            ))}
-        </fieldset>
-      )}
+            </div>
+          ))}
+      </fieldset>
       <NavButtons />
     </>
   );

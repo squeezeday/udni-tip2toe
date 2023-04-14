@@ -13,37 +13,42 @@ export default function Overview() {
 
   return (
     <>
-      {tip2toeForm.formSections?.map((section) => {
-        return (
-          <Disclosure key={section.slug}>
-            {({ open }) => (
-              <>
-                <Disclosure.Button
-                  className={` flex w-full items-center justify-between  rounded ${
-                    open ? 'bg-udni-teal text-white p-2' : 'py-1 pr-2'
-                  }`}
-                >
-                  <span>{section.title}</span>
-                  <ChevronUpIcon
-                    className={`${open ? 'rotate-180 transform' : ''} h-5 w-5 `}
-                  />
-                </Disclosure.Button>
-                <Disclosure.Panel className="bg-white p-2">
-                  {section.ontologies ? (
-                    <SectionPhenotypicFeatures
-                      key={`summary-${section.title}`}
-                      formSection={section}
-                      phenotypicFeatures={
-                        state?.phenoPacket?.phenotypicFeatures
-                      }
+      <h3 className="mt-4">Overview</h3>
+      {tip2toeForm.formSections
+        ?.filter((x) => x.ontologies?.length)
+        .map((section) => {
+          return (
+            <Disclosure key={section.slug}>
+              {({ open }) => (
+                <>
+                  <Disclosure.Button
+                    className={` flex w-full items-center justify-between py-1 rounded ${
+                      open ? 'text-udni-teal font-bold' : ''
+                    }`}
+                  >
+                    <span>{section.title}</span>
+                    <ChevronUpIcon
+                      className={`${
+                        open ? 'rotate-180 transform' : ''
+                      } h-5 w-5 `}
                     />
-                  ) : null}
-                </Disclosure.Panel>
-              </>
-            )}
-          </Disclosure>
-        );
-      })}
+                  </Disclosure.Button>
+                  <Disclosure.Panel className="bg-white p-2">
+                    {section.ontologies ? (
+                      <SectionPhenotypicFeatures
+                        key={`summary-${section.title}`}
+                        formSection={section}
+                        phenotypicFeatures={
+                          state?.phenoPacket?.phenotypicFeatures
+                        }
+                      />
+                    ) : null}
+                  </Disclosure.Panel>
+                </>
+              )}
+            </Disclosure>
+          );
+        })}
 
       <NavButtons />
     </>
@@ -69,14 +74,16 @@ function SectionPhenotypicFeatures({
   );
 
   return (
-    <section className="my-4">
-      <div className="md:flex flex-row">
+    <section>
+      <div className="md:flex flex-row text-sm">
         <div className="md:w-1/3">
           <h4>Abnormal</h4>
           {filteredPhenotypicFeatures
             ?.filter((x) => !x.excluded)
             .map((pf, i) => (
-              <Ontology key={`st-${i}`} ontology={pf.type} />
+              <p key={`st-${i}`}>
+                <Ontology ontology={pf.type} />
+              </p>
             ))}
         </div>
         <div className="md:w-1/3">
@@ -84,7 +91,9 @@ function SectionPhenotypicFeatures({
           {filteredPhenotypicFeatures
             ?.filter((x) => x.excluded)
             .map((pf, i) => (
-              <Ontology key={`st-${i}`} ontology={pf.type} />
+              <p key={`st-${i}`}>
+                <Ontology ontology={pf.type} />
+              </p>
             ))}
         </div>
         <div className="md:w-1/3 text-slate-400">
@@ -96,7 +105,9 @@ function SectionPhenotypicFeatures({
                 !filteredPhenotypicFeatures?.some((pf) => pf.type?.id === x.id),
             )
             .map((ontology, i) => (
-              <Ontology key={`st-${i}`} ontology={ontology} />
+              <p key={`st-${i}`}>
+                <Ontology ontology={ontology} />
+              </p>
             ))}
         </div>
       </div>
