@@ -18,8 +18,8 @@ export default function UploadedFiles({ section }: IProps) {
               className="relative h-52 w-52 flex items-center justify-center"
               key={file.uri}
             >
-              {file.fileAttributes['mimetype']
-                .toLowerCase()
+              {file.fileAttributes['mimeType']
+                ?.toLowerCase()
                 .startsWith('image/') && (
                 <img
                   src={`${file.uri}`}

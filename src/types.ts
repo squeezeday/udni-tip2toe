@@ -43,7 +43,7 @@ export interface UploadedFile {
   _id: string;
   name: string;
   size: number;
-  mimetype: string;
+  mimeType: string;
   url: string;
 }
 

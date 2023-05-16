@@ -3,7 +3,7 @@ import { filesize } from 'filesize';
 
 interface IProps {
   name: string;
-  mimeType: string;
+  mimeType?: string;
   size: number | string;
   url: string;
   children?: React.ReactNode;
@@ -15,7 +15,7 @@ export default function FilePreview({
   url,
   children,
 }: IProps) {
-  if (mimeType.toLowerCase().startsWith('image/') !== true) {
+  if (mimeType?.toLowerCase().startsWith('image/') !== true) {
     return (
       <p className="flex space-x-2 items-center my-2" key={url}>
         <PaperClipIcon className="w-5 h-5" />
