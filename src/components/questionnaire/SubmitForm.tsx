@@ -63,11 +63,15 @@ export default function SubmitForm() {
 
     // protobuf timestamp hack
     if (dto.subject?.dateOfBirth) {
-      dto.subject.dateOfBirth = {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        seconds: new Date(dto.subject.dateOfBirth).getTime(),
-      };
+      if ((dto.subject.dateOfBirth as unknown as string).length === 0) {
+        dto.subject.dateOfBirth = undefined;
+      } else {
+        dto.subject.dateOfBirth = {
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          seconds: new Date(dto.subject.dateOfBirth).getTime(),
+        };
+      }
     }
 
     const VITE_APIURL = import.meta.env.VITE_APIURL;
