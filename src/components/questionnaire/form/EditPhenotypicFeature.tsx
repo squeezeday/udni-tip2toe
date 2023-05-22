@@ -1,5 +1,5 @@
 import { OntologyClass } from '../../../interfaces/phenopackets/schema/v2/core/base';
-import { IQuestion, YesNoUnknown } from '../../../types';
+import { YesNoUnknown } from '../../../types';
 import SelectNormal from './SelectNormal';
 
 interface IProps {

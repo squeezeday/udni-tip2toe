@@ -120,6 +120,9 @@ export default function EditPhenotypicFeatures({ slug, ontologies }: IProps) {
     if (phenotypicFeature?.excluded === false) return 'yes';
     return 'unknown';
   };
+  if (!ontologies) {
+    return <></>;
+  }
   return (
     <>
       <div className="inline-flex my-2 text-xs border rounded border-slate-300 text-slate-500">
