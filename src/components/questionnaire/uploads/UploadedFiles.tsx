@@ -33,12 +33,13 @@ export default function UploadedFiles({ section }: IProps) {
                 ?.toLowerCase()
                 .startsWith('image/') !== true,
           )
-          ?.map((file) => (
+          ?.map((file, i) => (
             <FilePreview
               name={file.fileAttributes['name']}
               size={file.fileAttributes['size']}
               mimeType={file.fileAttributes['mimeType']}
               url={file.uri}
+              key={`file-doc-${i}`}
             >
               <button
                 className="rounded-full bg-white print:hidden hover:text-red-500"
@@ -55,16 +56,20 @@ export default function UploadedFiles({ section }: IProps) {
           ?.filter((file) =>
             file.fileAttributes['mimeType']?.toLowerCase().startsWith('image/'),
           )
-          .map((file) => (
+          .map((file, i) => (
             <FilePreview
               name={file.fileAttributes['name']}
               size={file.fileAttributes['size']}
               mimeType={file.fileAttributes['mimeType']}
               url={file.uri}
+              key={`file-img-${i}`}
             >
               <button
                 className="absolute top-4 right-4  rounded-full bg-white print:hidden hover:text-red-500"
-                onClick={() => dispatch({ type: 'REMOVE_FILE', payload: file })}
+                onClick={() => {
+                  if (confirm('Remove file?'))
+                    dispatch({ type: 'REMOVE_FILE', payload: file });
+                }}
                 title="Remove file"
               >
                 <XCircleIcon className="w-6 h-6 " />

@@ -1,4 +1,4 @@
-import { MinusCircleIcon } from '@heroicons/react/24/solid';
+import { XCircleIcon } from '@heroicons/react/24/solid';
 import { useContext } from 'react';
 import { AppContext } from '../../context/AppContext';
 
@@ -27,12 +27,14 @@ export default function UploadedFiles({ section }: IProps) {
                 />
               )}
               <button
-                className="btn btn-sm absolute right-2 bottom-2 bg-white"
+                className="absolute top-4 right-4  rounded-full bg-white print:hidden hover:text-red-500"
                 onClick={() => {
-                  dispatch({ type: 'REMOVE_FILE', payload: file });
+                  if (confirm('Remove file?'))
+                    dispatch({ type: 'REMOVE_FILE', payload: file });
                 }}
+                title="Remove file"
               >
-                <MinusCircleIcon className="h-4 w-4" /> Remove
+                <XCircleIcon className="w-6 h-6 " />
               </button>
             </figure>
           ))}

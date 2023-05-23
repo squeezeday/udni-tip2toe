@@ -13,12 +13,13 @@ export default function ViewPhotographs({ files, onRemove }: IProps) {
   if (!photographs?.length) return <></>;
   return (
     <div className="grid grid-cols-4 gap-4 my-4">
-      {photographs?.map((file) => (
+      {photographs?.map((file, i) => (
         <FilePreview
           name={file.fileAttributes['name']}
           size={file.fileAttributes['size']}
           mimeType={file.fileAttributes['mimeType']}
           url={file.uri}
+          key={`file-img-${i}`}
         >
           {onRemove ? (
             <button

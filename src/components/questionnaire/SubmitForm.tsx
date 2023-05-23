@@ -6,6 +6,7 @@ import { AppContext } from '../../context/AppContext';
 import { Phenopacket } from '../../interfaces/phenopackets/schema/v2/phenopackets';
 import { PhenopacketEntity } from '../../types';
 import Spinner from '../common/Spinner';
+import deepCopyObj from '../../utils/deepCopy';
 
 interface ISummaryFormModel {
   acceptTerms: boolean;
@@ -34,8 +35,11 @@ export default function SubmitForm() {
   };
 
   const onSubmit = async () => {
+    const phenoPacketCopy = deepCopyObj(
+      state.phenoPacket,
+    ) as Partial<Phenopacket>;
     const dto: Partial<Phenopacket> = {
-      ...state.phenoPacket,
+      ...phenoPacketCopy,
       metaData: {
         // protobuf timestamp hack
         created: {
@@ -62,15 +66,19 @@ export default function SubmitForm() {
     };
 
     // protobuf timestamp hack
-    if (dto.subject?.dateOfBirth) {
-      if ((dto.subject.dateOfBirth as unknown as string).length === 0) {
-        dto.subject.dateOfBirth = undefined;
-      } else {
+    const dateOfBirth = phenoPacketCopy.subject?.dateOfBirth;
+    if (dto.subject) {
+      if (
+        typeof dateOfBirth === 'string' &&
+        (dateOfBirth as unknown as string).length === 10
+      ) {
         dto.subject.dateOfBirth = {
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
-          seconds: new Date(dto.subject.dateOfBirth).getTime(),
+          seconds: new Date(dateOfBirth).getTime(),
         };
+      } else {
+        dto.subject.dateOfBirth = undefined;
       }
     }
 
