@@ -2,9 +2,9 @@ import { useContext, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { AppContext } from '../context/AppContext';
-
 import { Phenopacket } from '../interfaces/phenopackets/schema/v2/phenopackets';
 import Spinner from './common/Spinner';
+import { ICustomFormData } from '../types';
 
 interface IFormData {
   id: string;
@@ -22,20 +22,52 @@ export default function ContinueForm() {
     formState: { errors },
   } = useForm<IFormData>();
 
-  const doSubmit = async ({ id }: IFormData) => {
+  const doSubmit = async ({ id, password }: IFormData) => {
     try {
+      dispatch({ type: 'CLEAR' });
       setLoading(true);
-      const url = `${import.meta.env.VITE_APIURL}/api/v1/phenopacket/${id}`;
-      const ret = await fetch(url, {
-        method: 'GET',
-        headers: { Accept: 'application/json' },
-      });
-      if (ret.ok) {
-        const phenoPacket: Partial<Phenopacket> = await ret.json();
-        dispatch({ type: 'SET_PHENOPACKET', payload: phenoPacket });
-        navigate(`/questionnaire`);
-      } else {
+      const phenopacketUrl = `${
+        import.meta.env.VITE_APIURL
+      }/api/v1/phenopacket/${id}`;
+      const formDataUrl = `${
+        import.meta.env.VITE_APIURL
+      }/api/v1/formdata/${id}?password=${password}`;
+      const [phenopacketRet, customFormDataRet] = await Promise.all([
+        fetch(phenopacketUrl, {
+          method: 'GET',
+          headers: { Accept: 'application/json' },
+        }),
+        fetch(formDataUrl, {
+          method: 'GET',
+          headers: { Accept: 'application/json' },
+        }),
+      ]);
+      if (phenopacketRet.ok) {
+        const phenoPacket: Partial<Phenopacket> = await phenopacketRet.json();
+
+        if (customFormDataRet.ok) {
+          const customFormData: ICustomFormData =
+            await customFormDataRet.json();
+          dispatch({
+            type: 'CONTINUE_FORM',
+            payload: { phenoPacket, customFormData },
+          });
+          navigate(`/questionnaire`);
+        } else if (customFormDataRet.status === 404) {
+          setError('Warning! Phenopacket found but no associated custom data.');
+        } else if (customFormDataRet.status === 403) {
+          setError('Invalid password');
+        } else if (customFormDataRet.status === 500) {
+          setError('API server error');
+        }
+      } else if (phenopacketRet.status === 404) {
         setError('Phenopacket not found');
+      } else if (phenopacketRet.status === 403) {
+        setError('Unauthorized');
+      } else if (phenopacketRet.status === 500) {
+        setError('API server error');
+      } else {
+        setError('Unknown error');
       }
     } catch (error) {
       setError('Unable to load phenopacket');

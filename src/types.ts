@@ -74,3 +74,7 @@ export interface ICustomFormData {
   // eat: string;
   // medical: string;
 }
+
+export interface PhenopacketDate {
+  seconds: number;
+}

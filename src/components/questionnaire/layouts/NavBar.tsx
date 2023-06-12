@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import ApiStatus from '../../ApiStatus';
 
 export default function NavBar() {
   return (
@@ -12,7 +13,9 @@ export default function NavBar() {
             Help
           </Link>
         </div>
-        <div></div>
+        <div>
+          <ApiStatus />
+        </div>
       </div>
     </header>
   );

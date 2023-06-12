@@ -2,7 +2,7 @@ import { createContext, useEffect, useMemo, useReducer } from 'react';
 import { Individual } from '../interfaces/phenopackets/schema/v2/core/individual';
 import { PhenotypicFeature } from '../interfaces/phenopackets/schema/v2/core/phenotypic_feature';
 import { Phenopacket } from '../interfaces/phenopackets/schema/v2/phenopackets';
-import { ICustomFormData } from '../types';
+import { ICustomFormData, PhenopacketDate } from '../types';
 import { File as PhenopacketFile } from '../interfaces/phenopackets/schema/v2/core/base';
 
 export type Action =
@@ -21,8 +21,11 @@ export type Action =
       payload: Partial<PhenotypicFeature>;
     }
   | {
-      type: 'SET_PHENOPACKET';
-      payload: Partial<Phenopacket>;
+      type: 'CONTINUE_FORM';
+      payload: {
+        phenoPacket: Partial<Phenopacket>;
+        customFormData: ICustomFormData;
+      };
     }
   | { type: 'REMOVE_FILE'; payload: PhenopacketFile }
   | { type: 'ADD_FILE'; payload: PhenopacketFile }
@@ -72,8 +75,23 @@ const appReducer = (state: IAppContext, action: Action) => {
           subject: action.payload as Individual,
         },
       };
-    case 'SET_PHENOPACKET':
-      return { ...state, phenoPacket: action.payload as Partial<Phenopacket> };
+    case 'CONTINUE_FORM':
+      const { phenoPacket, customFormData } = action.payload;
+      if (
+        phenoPacket.subject &&
+        typeof phenoPacket.subject.dateOfBirth === 'object'
+      )
+        // @ts-expect-error string <-> date. Phenopacket date workaround.
+        phenoPacket.subject.dateOfBirth = new Date(
+          (
+            phenoPacket.subject.dateOfBirth as unknown as PhenopacketDate
+          ).seconds,
+        ).toLocaleDateString();
+      return {
+        phenoPacket,
+        customFormData,
+        autoSave: false,
+      };
     case 'REMOVE_PHENOTYPIC_FEATURE':
       return {
         ...state,

@@ -17,7 +17,6 @@ export default function Summary({ phenoPacket, customFormData }: IProps) {
         files={phenoPacket?.files?.filter((x) =>
           x.fileAttributes['section'].startsWith('photographs'),
         )}
-        // onRemove={(file) => dispatch({ type: 'REMOVE_FILE', payload: file })}
       />
       <ViewFormSection
         slug="this-is-me"

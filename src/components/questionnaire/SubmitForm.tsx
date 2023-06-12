@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router-dom';
 import { AppContext } from '../../context/AppContext';
 import { Phenopacket } from '../../interfaces/phenopackets/schema/v2/phenopackets';
-import { PhenopacketEntity } from '../../types';
+import { ICustomFormData, PhenopacketEntity } from '../../types';
 import Spinner from '../common/Spinner';
 import deepCopyObj from '../../utils/deepCopy';
 
@@ -18,6 +18,7 @@ export default function SubmitForm() {
   const [phenoPacket, setPhenoPacket] = useState<
     PhenopacketEntity | undefined
   >();
+  const [password, setPassword] = useState('');
 
   const {
     handleSubmit,
@@ -30,6 +31,8 @@ export default function SubmitForm() {
     if (confirm('Clear form data?')) {
       reset();
       dispatch({ type: 'CLEAR' });
+      setPhenoPacket(undefined);
+      setPassword('');
       navigate('/');
     }
   };
@@ -97,7 +100,7 @@ export default function SubmitForm() {
       const ret = (await res.json()) as PhenopacketEntity;
       setPhenoPacket(ret);
 
-      await fetch(`${VITE_APIURL}/api/v1/formdata`, {
+      const formDataRes = await fetch(`${VITE_APIURL}/api/v1/formdata`, {
         method: 'POST',
         body: JSON.stringify({
           ...state.customFormData,
@@ -105,6 +108,8 @@ export default function SubmitForm() {
         }),
         headers: { 'Content-Type': 'application/json' },
       });
+      const formDataRet = (await formDataRes.json()) as ICustomFormData;
+      setPassword(formDataRet.password);
     }
   };
 
@@ -114,10 +119,13 @@ export default function SubmitForm() {
         {isSubmitted && isSubmitSuccessful ? (
           <p className="bg-blue-100 text-blue-500 p-4 rounded">
             Your form has been submitted successfully and was assigned ID{' '}
-            {phenoPacket?._id}
+            <strong>{phenoPacket?._id}</strong>, password:{' '}
+            <strong>{password}</strong>.
             <br />
-            Your phenopacket is available for fetching from the backend with
-            hash {phenoPacket?._hash}
+            <i className="text-sm">
+              Your phenopacket is also available for fetching from the backend
+              with hash {phenoPacket?._hash}
+            </i>
           </p>
         ) : null}
         {!isSubmitSuccessful && isSubmitted && !isSubmitting ? (
